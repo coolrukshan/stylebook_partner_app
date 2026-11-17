@@ -3,6 +3,16 @@
 - Spec: [docs/_specs/P-07_clients.md](../_specs/P-07_clients.md)
 - Design: no PNG. Follow the style guide and the P-09 list card look.
 
+> [!IMPORTANT]
+> **Prerequisites & Development Workflow:**
+> 1. **Check Git Status:** Before starting, run `git status`. If there are any uncommitted changes, **STOP** and ask the user to commit or stash them. Do not proceed on a dirty working tree.
+> 2. **Branch from `dev`:** Every plan must start on a new branch created from the `dev` branch (`git checkout dev && git pull origin dev && git checkout -b feature/p07-clients`). Never build directly on `dev` or `main`.
+> 3. **TDD (Test-Driven Development):** Strictly follow TDD:
+>    - Write failing unit/widget tests first (Red).
+>    - Implement minimal code to make tests pass (Green).
+>    - Refactor while keeping all tests passing (Refactor).
+>    - Verify with `flutter test` and `flutter analyze` before marking complete.
+
 ## 1. Summary and dependencies
 
 Searchable, sortable, cursor-paged client list with a client record (stats, preferences, private notes, history, upcoming bookings) and shortcuts (New booking, Message, Call). Two panes at >= 900 px, list then full-screen record on phone.
@@ -117,6 +127,11 @@ Widget:
 Golden: `clients_wide_1280.png` (two pane with selected client), `clients_phone_390.png` (list) and `client_detail_phone_390.png`. No PNG design exists, so goldens are regression only.
 
 ## 10. Task checklist
+
+0. **Pre-flight & Branching (TDD Setup):**
+   - Run `git status` — if uncommitted changes exist, **STOP** and ask the user to commit or stash.
+   - Checkout `dev`, pull latest, and branch: `git checkout dev && git pull origin dev && git checkout -b feature/p07-clients`.
+   - Follow TDD: write failing unit/widget tests first before implementing code.
 
 1. Confirm shared pieces from earlier plans exist (`SbFormat`, `ApiError`, `SbTextField`, `SbSecondaryButton`, `SbAvatar`, `SbEmptyState`, `SbErrorPanel`, `SbSkeleton`, `SbConfirmDialog`); add missing ones to `sb_ui` with widget tests.
 2. Add deps (`url_launcher`, freezed stack, l10n) and run `flutter pub get` at the root.

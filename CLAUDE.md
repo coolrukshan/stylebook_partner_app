@@ -13,7 +13,8 @@ Flutter app (web/tablet first, Android, iOS) for salon owners, managers and spec
 - `docs/_specs/` BA specs per screen, `docs/backlog/` PM backlog and status
 
 ## Rules (full list in the instructions doc §5)
-- Git: check `git status` first; work on `feature/<name>` branches off `main`; never commit to `main`.
+- Git: check `git status` first (if uncommitted changes exist, stop and ask to commit); work on `feature/<name>` branches off `dev`; never commit directly to `dev` or `main`.
+- Development: practice strict TDD (write tests first: Red -> Green -> Refactor).
 - UI: only `sb_ui` tokens/components (`context.sb`, `Theme.of`). No hard-coded colours, sizes, radii, shadows. Actions are black pills.
 - API is the source of truth for slots, prices, fees, payouts. The app never computes them.
 - Destructive actions confirm first; decline and stock changes need a reason; confirm buttons use `danger`.

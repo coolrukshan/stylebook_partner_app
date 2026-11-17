@@ -2,6 +2,16 @@
 - Spec: [docs/_specs/P-02_today.md](../_specs/P-02_today.md)
 - PNGs: `mobile/P-02_today.png`, `P-02_today_scrolled.png`, `P-02_today_decline_reason.png`
 
+> [!IMPORTANT]
+> **Prerequisites & Development Workflow:**
+> 1. **Check Git Status:** Before starting, run `git status`. If there are any uncommitted changes, **STOP** and ask the user to commit or stash them. Do not proceed on a dirty working tree.
+> 2. **Branch from `dev`:** Every plan must start on a new branch created from the `dev` branch (`git checkout dev && git pull origin dev && git checkout -b feature/p02-today`). Never build directly on `dev` or `main`.
+> 3. **TDD (Test-Driven Development):** Strictly follow TDD:
+>    - Write failing unit/widget tests first (Red).
+>    - Implement minimal code to make tests pass (Green).
+>    - Refactor while keeping all tests passing (Refactor).
+>    - Verify with `flutter test` and `flutter analyze` before marking complete.
+
 ## 1. Summary and dependencies
 Home screen: stats, "Needs your OK" request cards (accept / decline with reason), "In the chair now", "Up next". Phone layout is built to the PNG; web/tablet gets the five-stat row and right column with what the API supports.
 Depends on: P-01 (session, role, salon context, Dio interceptors, `SbFormat`, l10n). Shares booking-action plumbing with P-04 (`BookingActionsRepository`); P-02 owns the adaptive shell (sidebar >= 900 px, floating nav on phone) because it is the first screen that needs it.
@@ -85,6 +95,12 @@ Widget
 Golden: `today_390.png` (populated), `today_decline_390.png`, `today_1280.png`.
 
 ## 10. Task checklist
+
+0. **Pre-flight & Branching (TDD Setup):**
+   - Run `git status` — if uncommitted changes exist, **STOP** and ask the user to commit or stash.
+   - Checkout `dev`, pull latest, and branch: `git checkout dev && git pull origin dev && git checkout -b feature/p02-today`.
+   - Follow TDD: write failing unit/widget tests first before implementing code.
+
 1. `sb_ui` components with widget tests (`SbStatCard`, buttons, `SbReasonChips`, `SbSkeleton`, `SbEmptyState`, `SbCountPill`, `SbAvatar`, `SbSectionHeader`, `showSbSheet`) and amber-tint chip variant.
 2. Shell + router restructure (phone nav + sidebar) with tests of breakpoint 899/900.
 3. Models + `TodayRepository` + fixtures + tests.

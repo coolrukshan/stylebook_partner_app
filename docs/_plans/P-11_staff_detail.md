@@ -3,6 +3,16 @@
 - Spec: [docs/_specs/P-11_staff_detail.md](../_specs/P-11_staff_detail.md)
 - Design: `mobile/P-11_staff_detail.png`, `mobile/P-11_staff_detail_scrolled.png` (header back/avatar/name/title, "Weekly availability", "Copy from" chips, 7 day rows with toggle and Start/End `-`/`+` steppers, "Time off" with amber "+ Add" and red "Remove", Services chips, black "Save availability").
 
+> [!IMPORTANT]
+> **Prerequisites & Development Workflow:**
+> 1. **Check Git Status:** Before starting, run `git status`. If there are any uncommitted changes, **STOP** and ask the user to commit or stash them. Do not proceed on a dirty working tree.
+> 2. **Branch from `dev`:** Every plan must start on a new branch created from the `dev` branch (`git checkout dev && git pull origin dev && git checkout -b feature/p11-staff-detail`). Never build directly on `dev` or `main`.
+> 3. **TDD (Test-Driven Development):** Strictly follow TDD:
+>    - Write failing unit/widget tests first (Red).
+>    - Implement minimal code to make tests pass (Green).
+>    - Refactor while keeping all tests passing (Refactor).
+>    - Verify with `flutter test` and `flutter analyze` before marking complete.
+
 ## 1. Summary and dependencies
 
 Edit one person's weekly hours (one PUT replacing the week), see/add time off, pick the services they do, copy hours from a colleague, and (owner) deactivate. Save sends two requests (hours then services) behind one button, so partial failure handling is part of the plan.
@@ -117,6 +127,11 @@ Widget:
 Golden: `staff_detail_phone_390.png` (compare with the PNG, plus scrolled variant), `staff_detail_wide_1280.png`.
 
 ## 10. Task checklist
+
+0. **Pre-flight & Branching (TDD Setup):**
+   - Run `git status` — if uncommitted changes exist, **STOP** and ask the user to commit or stash.
+   - Checkout `dev`, pull latest, and branch: `git checkout dev && git pull origin dev && git checkout -b feature/p11-staff-detail`.
+   - Follow TDD: write failing unit/widget tests first before implementing code.
 
 1. `sb_ui` additions (`SbSwitch`, `SbStepperButton`, `SbReasonField`, `SbConfirmDialog` danger variant, `SbAvatar`, `SbPill`) with tests.
 2. `SbFormat.time12`, `dateRange` + tests.

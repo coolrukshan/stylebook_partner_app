@@ -3,6 +3,16 @@
 - Spec: [docs/_specs/P-14_photo_detail.md](../_specs/P-14_photo_detail.md)
 - Design: `mobile/P-14_photo_detail.png`, `mobile/P-14_photo_delete_confirm.png`
 
+> [!IMPORTANT]
+> **Prerequisites & Development Workflow:**
+> 1. **Check Git Status:** Before starting, run `git status`. If there are any uncommitted changes, **STOP** and ask the user to commit or stash them. Do not proceed on a dirty working tree.
+> 2. **Branch from `dev`:** Every plan must start on a new branch created from the `dev` branch (`git checkout dev && git pull origin dev && git checkout -b feature/p14-photo-detail`). Never build directly on `dev` or `main`.
+> 3. **TDD (Test-Driven Development):** Strictly follow TDD:
+>    - Write failing unit/widget tests first (Red).
+>    - Implement minimal code to make tests pass (Green).
+>    - Refactor while keeping all tests passing (Refactor).
+>    - Verify with `flutter test` and `flutter analyze` before marking complete.
+
 ## 1. Summary and dependencies
 
 Edit one gallery photo: "Done by" specialist chips (single select), show-on-salon-page toggle, set as cover (added, not in design), delete with in-place confirm (phone) or dialog (web). Presented as a bottom sheet (phone) or right side panel (>= 900 px) from P-13.
@@ -115,6 +125,11 @@ Widget:
 Golden: `photo_detail_390.png` (idle) and `photo_detail_delete_confirm_390.png` (mirrors the two PNGs), `photo_detail_panel_1280.png`.
 
 ## 10. Task checklist
+
+0. **Pre-flight & Branching (TDD Setup):**
+   - Run `git status` — if uncommitted changes exist, **STOP** and ask the user to commit or stash.
+   - Checkout `dev`, pull latest, and branch: `git checkout dev && git pull origin dev && git checkout -b feature/p14-photo-detail`.
+   - Follow TDD: write failing unit/widget tests first before implementing code.
 
 1. Add `sb_ui` widgets: `SbDangerButton`, `SbOutlinedDangerButton`, `SbSwitchRow`, `SbSelectChip`, `showSbConfirm`, `showSbSnack` + tests (skip any already added by another plan).
 2. Extend repository/models (`update`, `delete`) + tests.

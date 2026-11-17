@@ -3,6 +3,16 @@
 - Spec: [docs/_specs/P-16_inventory.md](../_specs/P-16_inventory.md)
 - Design: no PNG. Reference `mobile/P-22_more.png` (More row "Inventory, N products low on stock, opens on web") and the web prototype board described in the instructions (§3 P-16).
 
+> [!IMPORTANT]
+> **Prerequisites & Development Workflow:**
+> 1. **Check Git Status:** Before starting, run `git status`. If there are any uncommitted changes, **STOP** and ask the user to commit or stash them. Do not proceed on a dirty working tree.
+> 2. **Branch from `dev`:** Every plan must start on a new branch created from the `dev` branch (`git checkout dev && git pull origin dev && git checkout -b feature/p16-inventory`). Never build directly on `dev` or `main`.
+> 3. **TDD (Test-Driven Development):** Strictly follow TDD:
+>    - Write failing unit/widget tests first (Red).
+>    - Implement minimal code to make tests pass (Green).
+>    - Refactor while keeping all tests passing (Refactor).
+>    - Verify with `flutter test` and `flutter analyze` before marking complete.
+
 ## 1. Summary and dependencies
 
 Web/tablet stock table with four summary cards, filter chips, search, adjust dialog (signed delta + mandatory reason) and a history side panel. On phone there is no native screen in v1: the More row opens the web app and shows the low-stock count badge.
@@ -130,6 +140,11 @@ Widget:
 Golden: `inventory_1280.png` (table with 1 low + 1 out + 1 hidden row), `inventory_phone_390.png` (open-on-web state), `adjust_dialog_1280.png`.
 
 ## 10. Task checklist
+
+0. **Pre-flight & Branching (TDD Setup):**
+   - Run `git status` — if uncommitted changes exist, **STOP** and ask the user to commit or stash.
+   - Checkout `dev`, pull latest, and branch: `git checkout dev && git pull origin dev && git checkout -b feature/p16-inventory`.
+   - Follow TDD: write failing unit/widget tests first before implementing code.
 
 1. Prereq check; add `data_table_2`, `url_launcher`; `SbConfig.webAppUrl`.
 2. Models + repository + tests.

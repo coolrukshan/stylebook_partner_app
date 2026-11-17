@@ -3,6 +3,16 @@
 - Spec: [docs/_specs/P-17_earnings.md](../_specs/P-17_earnings.md)
 - Design: no PNG. Phone shows nothing here (Today summary, P-02; More row from `mobile/P-22_more.png`, "Owner only").
 
+> [!IMPORTANT]
+> **Prerequisites & Development Workflow:**
+> 1. **Check Git Status:** Before starting, run `git status`. If there are any uncommitted changes, **STOP** and ask the user to commit or stash them. Do not proceed on a dirty working tree.
+> 2. **Branch from `dev`:** Every plan must start on a new branch created from the `dev` branch (`git checkout dev && git pull origin dev && git checkout -b feature/p17-earnings`). Never build directly on `dev` or `main`.
+> 3. **TDD (Test-Driven Development):** Strictly follow TDD:
+>    - Write failing unit/widget tests first (Red).
+>    - Implement minimal code to make tests pass (Green).
+>    - Refactor while keeping all tests passing (Refactor).
+>    - Verify with `flutter test` and `flutter analyze` before marking complete.
+
 ## 1. Summary and dependencies
 
 Owner-only web/tablet screen: period switch + custom range, stat cards (gross, platform fee, tips, net), `fl_chart` daily bar chart, expandable "How net is calculated", staff earnings table, payout history table with status pills and copyable reference, CSV export via async job. Each section loads and fails independently.
@@ -131,6 +141,11 @@ Widget:
 Golden: `earnings_1280.png` (cards, chart with 7 bars, both tables, collapsed breakdown) and `earnings_390.png` (owner "Open on web" state; phone has no screen so this is the only phone golden).
 
 ## 10. Task checklist
+
+0. **Pre-flight & Branching (TDD Setup):**
+   - Run `git status` — if uncommitted changes exist, **STOP** and ask the user to commit or stash.
+   - Checkout `dev`, pull latest, and branch: `git checkout dev && git pull origin dev && git checkout -b feature/p17-earnings`.
+   - Follow TDD: write failing unit/widget tests first before implementing code.
 
 1. Prereqs + dependencies (`fl_chart`, `data_table_2`, `url_launcher`, `share_plus`, `timezone`); confirm salon time zone provider.
 2. Models, `EarningsRange` + tests.

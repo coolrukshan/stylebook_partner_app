@@ -2,6 +2,16 @@
 - Spec: [docs/_specs/P-06_new_booking.md](../_specs/P-06_new_booking.md)
 - PNG: `mobile/P-06_new_booking_sheet.png`
 
+> [!IMPORTANT]
+> **Prerequisites & Development Workflow:**
+> 1. **Check Git Status:** Before starting, run `git status`. If there are any uncommitted changes, **STOP** and ask the user to commit or stash them. Do not proceed on a dirty working tree.
+> 2. **Branch from `dev`:** Every plan must start on a new branch created from the `dev` branch (`git checkout dev && git pull origin dev && git checkout -b feature/p06-new-booking`). Never build directly on `dev` or `main`.
+> 3. **TDD (Test-Driven Development):** Strictly follow TDD:
+>    - Write failing unit/widget tests first (Red).
+>    - Implement minimal code to make tests pass (Green).
+>    - Refactor while keeping all tests passing (Refactor).
+>    - Verify with `flutter test` and `flutter analyze` before marking complete.
+
 ## 1. Summary and dependencies
 Bottom sheet (phone) / modal dialog (web, max ~560 px) to add a walk-in or phone booking: client (optional, with lookup), service chips, eligible specialist chips, free-time chips from the slots API, "Add booking". Entry points: Calendar FAB, "+ New booking" pill (Today, Calendar toolbar), tapping a free calendar slot (prefill).
 Depends on: P-01 (session `salonId`, role/permissions, interceptors incl. idempotency, `SbFormat`), P-02 (`SbSkeleton`, `SbEmptyState`, `SbErrorBanner`, `showSbSheet`, `SbReasonChips`-style chip groups, amber-tint chips, `SbSecondaryButton`), P-03 (route entry, `invalidateCalendar`), shared `AvailabilityRepository` (created with P-05 or here; coordinate: path `apps/partner/lib/shared/availability/`). Services are read read-only (P-08 owns editing).
@@ -89,6 +99,12 @@ Widget
 Golden: `new_booking_390.png` (PNG state: Skin fade, Dilan, 6:00 PM), `new_booking_dialog_1280.png`.
 
 ## 10. Task checklist
+
+0. **Pre-flight & Branching (TDD Setup):**
+   - Run `git status` — if uncommitted changes exist, **STOP** and ask the user to commit or stash.
+   - Checkout `dev`, pull latest, and branch: `git checkout dev && git pull origin dev && git checkout -b feature/p06-new-booking`.
+   - Follow TDD: write failing unit/widget tests first before implementing code.
+
 1. Shared `AvailabilityRepository` (or reuse from P-05) + models + tests.
 2. Catalog, staff, client-lookup repositories + fixtures + tests.
 3. `EligibleStaffResolver` + tests (verify against a real response before locking approach).

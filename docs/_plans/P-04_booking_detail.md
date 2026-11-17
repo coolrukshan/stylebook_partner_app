@@ -2,6 +2,16 @@
 - Spec: [docs/_specs/P-04_booking_detail.md](../_specs/P-04_booking_detail.md)
 - PNG: `mobile/P-04_booking_sheet.png` (P-05 sheets are a separate plan)
 
+> [!IMPORTANT]
+> **Prerequisites & Development Workflow:**
+> 1. **Check Git Status:** Before starting, run `git status`. If there are any uncommitted changes, **STOP** and ask the user to commit or stash them. Do not proceed on a dirty working tree.
+> 2. **Branch from `dev`:** Every plan must start on a new branch created from the `dev` branch (`git checkout dev && git pull origin dev && git checkout -b feature/p04-booking-detail`). Never build directly on `dev` or `main`.
+> 3. **TDD (Test-Driven Development):** Strictly follow TDD:
+>    - Write failing unit/widget tests first (Red).
+>    - Implement minimal code to make tests pass (Green).
+>    - Refactor while keeping all tests passing (Refactor).
+>    - Verify with `flutter test` and `flutter analyze` before marking complete.
+
 ## 1. Summary and dependencies
 Booking sheet (phone bottom sheet, web side panel) showing header, summary, status actions, client info and below-the-fold sections. Primary black pill and Accept/Decline come from `allowed_actions` filtered by role. Move / No-show / Message are P-05 and plug into the same sheet via slots.
 Depends on: P-01 (session, role, interceptors, formatters), P-02 (`BookingActionsRepository`, `BookingAction`, `SbReasonChips`, `SbDangerButton`, `SbSecondaryButton`, `showSbSheet`, `SbSkeleton`, `SbErrorBanner`), P-03 (opens it with a `CalendarBooking` summary; invalidation helper). Feature folder `features/booking_detail/`.
@@ -86,6 +96,12 @@ Widget
 Golden: `booking_sheet_390.png` (confirmed, Check in), `booking_sheet_requested_390.png`, `booking_panel_1280.png`.
 
 ## 10. Task checklist
+
+0. **Pre-flight & Branching (TDD Setup):**
+   - Run `git status` — if uncommitted changes exist, **STOP** and ask the user to commit or stash.
+   - Checkout `dev`, pull latest, and branch: `git checkout dev && git pull origin dev && git checkout -b feature/p04-booking-detail`.
+   - Follow TDD: write failing unit/widget tests first before implementing code.
+
 1. `sb_ui`: `SbInfoStrip`, `SbSection`, `SbStepTimeline`, side-panel width token + tests.
 2. Models + repositories (+ fixtures) + tests.
 3. `BookingVisibleActions` + tests (matrix).

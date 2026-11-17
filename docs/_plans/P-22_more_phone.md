@@ -3,6 +3,16 @@
 - Spec: [docs/_specs/P-22_more_phone.md](../_specs/P-22_more_phone.md)
 - Design: `mobile/P-22_more.png` (title "More", one white grouped card with 7 rows, black count pills for Orders 2, Reviews 2, Inventory 3, floating black nav with "More" selected).
 
+> [!IMPORTANT]
+> **Prerequisites & Development Workflow:**
+> 1. **Check Git Status:** Before starting, run `git status`. If there are any uncommitted changes, **STOP** and ask the user to commit or stash them. Do not proceed on a dirty working tree.
+> 2. **Branch from `dev`:** Every plan must start on a new branch created from the `dev` branch (`git checkout dev && git pull origin dev && git checkout -b feature/p22-more-phone`). Never build directly on `dev` or `main`.
+> 3. **TDD (Test-Driven Development):** Strictly follow TDD:
+>    - Write failing unit/widget tests first (Red).
+>    - Implement minimal code to make tests pass (Green).
+>    - Refactor while keeping all tests passing (Refactor).
+>    - Verify with `flutter test` and `flutter analyze` before marking complete.
+
 ## 1. Summary and dependencies
 
 The fifth tab of the phone shell: a role-filtered menu card that links to other screens, with count badges fetched from three independent calls. Rows for Inventory and AI Studio open the web app in the external browser. Sign out and Language appear as proposed account rows (Q5).
@@ -118,6 +128,11 @@ Widget (`test/shell/more/`):
 Golden: `more_owner_390.png` (matches `mobile/P-22_more.png` with floating nav at bottom, More selected) and `more_manager_390.png`, `more_specialist_390.png` (spec section 7 says per-role goldens at 390).
 
 ## 10. Task checklist
+
+0. **Pre-flight & Branching (TDD Setup):**
+   - Run `git status` — if uncommitted changes exist, **STOP** and ask the user to commit or stash.
+   - Checkout `dev`, pull latest, and branch: `git checkout dev && git pull origin dev && git checkout -b feature/p22-more-phone`.
+   - Follow TDD: write failing unit/widget tests first before implementing code.
 
 1. Check whether the shell and session exist; if not, build the minimal shell (5-tab `SbFloatingNav`) with role from a stub provider that is replaced later.
 2. Add `url_launcher`, `SbConfig.webAppBaseUrl`, and `lib/routes.dart` constants.

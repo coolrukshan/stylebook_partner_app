@@ -2,6 +2,16 @@
 - Spec: [docs/_specs/P-01_sign_in.md](../_specs/P-01_sign_in.md)
 - No PNG exists for this screen; follow style guide §5 (input 48, primary pill 52, link = amber text button).
 
+> [!IMPORTANT]
+> **Prerequisites & Development Workflow:**
+> 1. **Check Git Status:** Before starting, run `git status`. If there are any uncommitted changes, **STOP** and ask the user to commit or stash them. Do not proceed on a dirty working tree.
+> 2. **Branch from `dev`:** Every plan must start on a new branch created from the `dev` branch (`git checkout dev && git pull origin dev && git checkout -b feature/p01-sign-in`). Never build directly on `dev` or `main`.
+> 3. **TDD (Test-Driven Development):** Strictly follow TDD:
+>    - Write failing unit/widget tests first (Red).
+>    - Implement minimal code to make tests pass (Green).
+>    - Refactor while keeping all tests passing (Refactor).
+>    - Verify with `flutter test` and `flutter analyze` before marking complete.
+
 ## 1. Summary and dependencies
 OTP sign-in (phone, then 6-digit code), secure token storage, silent refresh, session bootstrap (`/v1/me` + salon context) and the router guard that every other screen relies on. Email + password tab is NOT built (no partner endpoint, Gap 1).
 Prerequisite for everything: P-01 owns the shared plumbing that later plans reuse.
@@ -89,6 +99,12 @@ Widget
 Golden: `sign_in_phone_390.png`, `sign_in_otp_390.png`, `sign_in_phone_1280.png` (fonts via bundled Manrope in tests; `GoogleFonts.config.allowRuntimeFetching = false`).
 
 ## 10. Task checklist
+
+0. **Pre-flight & Branching (TDD Setup):**
+   - Run `git status` — if uncommitted changes exist, **STOP** and ask the user to commit or stash.
+   - Checkout `dev`, pull latest, and branch: `git checkout dev && git pull origin dev && git checkout -b feature/p01-sign-in`.
+   - Follow TDD: write failing unit/widget tests first before implementing code.
+
 1. Add pubspec deps; `flutter pub get` at root; set up `l10n.yaml`, `app_en.arb`, wire delegates in `app.dart` (verify: `flutter gen-l10n`, analyze).
 2. `sb_core`: `SbFormat`, `Phone`, `Role`, `SessionUser`, `ApiError`, `TokenStorage` + tests.
 3. `sb_api`: interceptors + exception mapper + tests with `http_mock_adapter`-style fake adapter.

@@ -3,6 +3,16 @@
 - Spec: [docs/_specs/P-12_leave_requests.md](../_specs/P-12_leave_requests.md)
 - Design: no PNG. Follow the "Needs your action" pattern in `mobile/P-02_today.png` and `mobile/P-02_today_decline_reason.png`.
 
+> [!IMPORTANT]
+> **Prerequisites & Development Workflow:**
+> 1. **Check Git Status:** Before starting, run `git status`. If there are any uncommitted changes, **STOP** and ask the user to commit or stash them. Do not proceed on a dirty working tree.
+> 2. **Branch from `dev`:** Every plan must start on a new branch created from the `dev` branch (`git checkout dev && git pull origin dev && git checkout -b feature/p12-leave-requests`). Never build directly on `dev` or `main`.
+> 3. **TDD (Test-Driven Development):** Strictly follow TDD:
+>    - Write failing unit/widget tests first (Red).
+>    - Implement minimal code to make tests pass (Green).
+>    - Refactor while keeping all tests passing (Refactor).
+>    - Verify with `flutter test` and `flutter analyze` before marking complete.
+
 ## 1. Summary and dependencies
 
 "Staff leave" tab inside "Needs your action" on Today: cards for pending leave requests with Approve (black pill) and Decline (white pill, required reason, red confirm). Approve can return conflicting bookings, which needs a "Approve anyway" (`force`) dialog and a "N bookings need to be moved" follow-up.
@@ -108,6 +118,11 @@ Widget:
 Golden: `leave_tab_phone_390.png`, `leave_tab_wide_1280.png` (with a decline panel open in one variant).
 
 ## 10. Task checklist
+
+0. **Pre-flight & Branching (TDD Setup):**
+   - Run `git status` — if uncommitted changes exist, **STOP** and ask the user to commit or stash.
+   - Checkout `dev`, pull latest, and branch: `git checkout dev && git pull origin dev && git checkout -b feature/p12-leave-requests`.
+   - Follow TDD: write failing unit/widget tests first before implementing code.
 
 1. Agree tab/badge contract with P-02 owner; confirm `status` query parameter works on time-off (check `status` param in openapi: present).
 2. Add missing `sb_ui` widgets (`SbReasonField`, danger confirm, tab badge, `SbSecondaryButton`) with tests.

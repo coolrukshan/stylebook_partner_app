@@ -3,6 +3,16 @@
 - Spec: [docs/_specs/P-19_ai_studio.md](../_specs/P-19_ai_studio.md)
 - Design: no PNG. Phone only has a More row "Opens on web" (`mobile/P-22_more.png`), so there is no native phone screen in v1 (Q6). This plan builds the web/tablet screen only. On phone widths, the route shows a short "Open on web" screen.
 
+> [!IMPORTANT]
+> **Prerequisites & Development Workflow:**
+> 1. **Check Git Status:** Before starting, run `git status`. If there are any uncommitted changes, **STOP** and ask the user to commit or stash them. Do not proceed on a dirty working tree.
+> 2. **Branch from `dev`:** Every plan must start on a new branch created from the `dev` branch (`git checkout dev && git pull origin dev && git checkout -b feature/p19-ai-studio`). Never build directly on `dev` or `main`.
+> 3. **TDD (Test-Driven Development):** Strictly follow TDD:
+>    - Write failing unit/widget tests first (Red).
+>    - Implement minimal code to make tests pass (Green).
+>    - Refactor while keeping all tests passing (Refactor).
+>    - Verify with `flutter test` and `flutter analyze` before marking complete.
+
 ## 1. Summary and dependencies
 
 Two-column AI Studio: post builder on the left (prompt, platform, tone, language, goal, hashtags, output type, credits card, "Generate · N credits"), result pane on the right (text with Copy and Share, image, Delete) and a history grid below. Generation is async: POST returns 202, then poll GET until terminal. Credits can be bought via purchase endpoint.
@@ -108,6 +118,11 @@ Widget:
 Golden: `ai_studio_1280.png` (builder, result success, history of 3). Phone golden at 390 for `AiStudioWebOnlyView`.
 
 ## 10. Task checklist
+
+0. **Pre-flight & Branching (TDD Setup):**
+   - Run `git status` — if uncommitted changes exist, **STOP** and ask the user to commit or stash.
+   - Checkout `dev`, pull latest, and branch: `git checkout dev && git pull origin dev && git checkout -b feature/p19-ai-studio`.
+   - Follow TDD: write failing unit/widget tests first before implementing code.
 
 1. Confirm prerequisites (shell, auth/role, Dio idempotency, l10n); add `share_plus`, `url_launcher`, `uuid`.
 2. Add `sb_ui` pieces (banner, chip group, counter field, skeleton, option tile, danger/secondary buttons) with widget tests.

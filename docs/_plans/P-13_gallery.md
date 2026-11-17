@@ -2,7 +2,17 @@
 
 - Spec: [docs/_specs/P-13_gallery.md](../_specs/P-13_gallery.md)
 - Design: `mobile/P-13_gallery.png`
-- Branch: `feature/p13-gallery` off `main` (P-14 is built on the same branch, see P-14 plan).
+- Branch: `feature/p13-gallery` off `dev` (P-14 is built on the same branch, see P-14 plan).
+
+> [!IMPORTANT]
+> **Prerequisites & Development Workflow:**
+> 1. **Check Git Status:** Before starting, run `git status`. If there are any uncommitted changes, **STOP** and ask the user to commit or stash them. Do not proceed on a dirty working tree.
+> 2. **Branch from `dev`:** Every plan must start on a new branch created from the `dev` branch (`git checkout dev && git pull origin dev && git checkout -b feature/p13-gallery`). Never build directly on `dev` or `main`.
+> 3. **TDD (Test-Driven Development):** Strictly follow TDD:
+>    - Write failing unit/widget tests first (Red).
+>    - Implement minimal code to make tests pass (Green).
+>    - Refactor while keeping all tests passing (Refactor).
+>    - Verify with `flutter test` and `flutter analyze` before marking complete.
 
 ## 1. Summary and dependencies
 
@@ -142,6 +152,11 @@ Widget:
 Golden: `gallery_390.png` and `gallery_1280.png` (owner, 8 items incl. 1 hidden, local asset images, fonts via `google_fonts` allowRuntimeFetching off).
 
 ## 10. Task checklist
+
+0. **Pre-flight & Branching (TDD Setup):**
+   - Run `git status` — if uncommitted changes exist, **STOP** and ask the user to commit or stash.
+   - Checkout `dev`, pull latest, and branch: `git checkout dev && git pull origin dev && git checkout -b feature/p13-gallery`.
+   - Follow TDD: write failing unit/widget tests first before implementing code.
 
 1. Confirm prerequisites merged (auth/role, shell, Dio interceptors); add dependencies; run `flutter pub get`.
 2. Add `l10n.yaml` + ARB keys; wire `localizationsDelegates` in `app.dart`.

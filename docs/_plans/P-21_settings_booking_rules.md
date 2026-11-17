@@ -3,6 +3,16 @@
 - Spec: [docs/_specs/P-21_settings_booking_rules.md](../_specs/P-21_settings_booking_rules.md)
 - Design: `mobile/P-21_booking_rules.png` (phone: three chip groups, preview card, black "Save settings"). The PNG shows selected chips with an amber outline and amber tint, while `SbChoiceChip` in `packages/sb_ui/lib/theme/sb_theme.dart` renders selected as solid ink. The style guide and instructions favour black for selected chips elsewhere, so this screen needs a variant (section 5).
 
+> [!IMPORTANT]
+> **Prerequisites & Development Workflow:**
+> 1. **Check Git Status:** Before starting, run `git status`. If there are any uncommitted changes, **STOP** and ask the user to commit or stash them. Do not proceed on a dirty working tree.
+> 2. **Branch from `dev`:** Every plan must start on a new branch created from the `dev` branch (`git checkout dev && git pull origin dev && git checkout -b feature/p21-booking-rules`). Never build directly on `dev` or `main`.
+> 3. **TDD (Test-Driven Development):** Strictly follow TDD:
+>    - Write failing unit/widget tests first (Red).
+>    - Implement minimal code to make tests pass (Green).
+>    - Refactor while keeping all tests passing (Refactor).
+>    - Verify with `flutter test` and `flutter analyze` before marking complete.
+
 ## 1. Summary and dependencies
 
 Settings screen with four sections: Booking rules (auto-confirm, cancel window, late fee, no-show fee, reschedule limit, pay at salon, live policy preview), Opening hours (7 rows), Holidays (add/remove closures), Payout account (owner only). Phone shows only Booking rules via More; web/tablet shows all sections as tabs. One Save per section.
@@ -121,6 +131,11 @@ Widget:
 Golden: `booking_rules_390.png` (matches `mobile/P-21_booking_rules.png` setup: Returning, 24 h, 50%); `settings_rules_1280.png` (form plus sticky preview); optional `settings_hours_1280.png`.
 
 ## 10. Task checklist
+
+0. **Pre-flight & Branching (TDD Setup):**
+   - Run `git status` — if uncommitted changes exist, **STOP** and ask the user to commit or stash.
+   - Checkout `dev`, pull latest, and branch: `git checkout dev && git pull origin dev && git checkout -b feature/p21-booking-rules`.
+   - Follow TDD: write failing unit/widget tests first before implementing code.
 
 1. Confirm shell, auth/role, Dio redaction, l10n, shared widgets exist.
 2. Add `sb_ui` pieces (`SbOptionChip`, stepper, switch row, time/date field, banner, floating save bar) with widget tests.

@@ -3,6 +3,16 @@
 - Spec: [docs/_specs/P-15_orders.md](../_specs/P-15_orders.md)
 - Design: `mobile/P-15_orders.png` (3 cards: Paid/Accept, Accepted/Mark packed, Ready for pickup/Verify pickup code)
 
+> [!IMPORTANT]
+> **Prerequisites & Development Workflow:**
+> 1. **Check Git Status:** Before starting, run `git status`. If there are any uncommitted changes, **STOP** and ask the user to commit or stash them. Do not proceed on a dirty working tree.
+> 2. **Branch from `dev`:** Every plan must start on a new branch created from the `dev` branch (`git checkout dev && git pull origin dev && git checkout -b feature/p15-orders`). Never build directly on `dev` or `main`.
+> 3. **TDD (Test-Driven Development):** Strictly follow TDD:
+>    - Write failing unit/widget tests first (Red).
+>    - Implement minimal code to make tests pass (Green).
+>    - Refactor while keeping all tests passing (Refactor).
+>    - Verify with `flutter test` and `flutter analyze` before marking complete.
+
 ## 1. Summary and dependencies
 
 Marketplace orders list (cards on phone, list + detail pane on web), state-machine buttons driven by `allowed_actions`, pickup-code verification sheet, cancel with reason, badge counts from `counts`.
@@ -134,6 +144,11 @@ Widget:
 Golden: `orders_390.png` (3 cards as PNG) and `orders_1280.png` (list + detail pane).
 
 ## 10. Task checklist
+
+0. **Pre-flight & Branching (TDD Setup):**
+   - Run `git status` — if uncommitted changes exist, **STOP** and ask the user to commit or stash.
+   - Checkout `dev`, pull latest, and branch: `git checkout dev && git pull origin dev && git checkout -b feature/p15-orders`.
+   - Follow TDD: write failing unit/widget tests first before implementing code.
 
 1. Prereq check; add deps (freezed, json, url_launcher optional, connectivity); ARB scaffolding.
 2. Models + enums + tests (including pickup_code omission).

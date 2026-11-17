@@ -2,6 +2,16 @@
 - Spec: [docs/_specs/P-03_calendar.md](../_specs/P-03_calendar.md)
 - PNGs: `mobile/P-03_calendar.png`, `mobile/P-03_calendar_other_day.png`
 
+> [!IMPORTANT]
+> **Prerequisites & Development Workflow:**
+> 1. **Check Git Status:** Before starting, run `git status`. If there are any uncommitted changes, **STOP** and ask the user to commit or stash them. Do not proceed on a dirty working tree.
+> 2. **Branch from `dev`:** Every plan must start on a new branch created from the `dev` branch (`git checkout dev && git pull origin dev && git checkout -b feature/p03-calendar`). Never build directly on `dev` or `main`.
+> 3. **TDD (Test-Driven Development):** Strictly follow TDD:
+>    - Write failing unit/widget tests first (Red).
+>    - Implement minimal code to make tests pass (Green).
+>    - Refactor while keeping all tests passing (Refactor).
+>    - Verify with `flutter test` and `flutter analyze` before marking complete.
+
 ## 1. Summary and dependencies
 Phone: week day-strip, staff chips, agenda list for the selected day, FAB. Web/tablet: Day view (column per specialist, time grid, now line), Week view, List view, date navigation. Tapping a booking opens P-04; FAB / "+ New booking" opens P-06.
 Depends on: P-01 (session, role, `SbFormat`, interceptors), P-02 (shell, `SbSkeleton`, `SbEmptyState`, `SbErrorBanner`, `SbSecondaryButton`, `SbAvatar`, `showSbSheet`, partner status labels). Consumed by: P-04 (opened with a `CalendarBookingOut` summary), P-05 (drag-to-move later), P-06 (prefill date/time/staff).
@@ -73,6 +83,12 @@ Widget
 Golden: `calendar_390.png`, `calendar_other_day_390.png`, `calendar_day_1280.png`, `calendar_week_1280.png`.
 
 ## 10. Task checklist
+
+0. **Pre-flight & Branching (TDD Setup):**
+   - Run `git status` — if uncommitted changes exist, **STOP** and ask the user to commit or stash.
+   - Checkout `dev`, pull latest, and branch: `git checkout dev && git pull origin dev && git checkout -b feature/p03-calendar`.
+   - Follow TDD: write failing unit/widget tests first before implementing code.
+
 1. `sb_ui`: `SbFab`, `SbWeekStrip`, `SbBookingTile`, `SbSegmented` + widget tests.
 2. Models, `CalendarTime`, repository + fixtures + tests.
 3. `CalendarSelection` + `rangeFor` + tests (incl. role clamp).

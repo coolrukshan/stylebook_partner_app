@@ -3,6 +3,16 @@
 - Spec: [docs/_specs/P-18_reviews.md](../_specs/P-18_reviews.md)
 - Design: `mobile/P-18_reviews.png` (phone). Web/tablet has no PNG; follow the spec layout.
 
+> [!IMPORTANT]
+> **Prerequisites & Development Workflow:**
+> 1. **Check Git Status:** Before starting, run `git status`. If there are any uncommitted changes, **STOP** and ask the user to commit or stash them. Do not proceed on a dirty working tree.
+> 2. **Branch from `dev`:** Every plan must start on a new branch created from the `dev` branch (`git checkout dev && git pull origin dev && git checkout -b feature/p18-reviews`). Never build directly on `dev` or `main`.
+> 3. **TDD (Test-Driven Development):** Strictly follow TDD:
+>    - Write failing unit/widget tests first (Red).
+>    - Implement minimal code to make tests pass (Green).
+>    - Refactor while keeping all tests passing (Refactor).
+>    - Verify with `flutter test` and `flutter analyze` before marking complete.
+
 ## 1. Summary and dependencies
 
 Reviews list with rating summary, filters, reply composer (with AI draft that is never auto-posted), edit reply, and report-as-fake. Phone: single list with a back pill. Tablet/web (>= 900 px): summary card on top, filter chips, list with a right-hand composer panel.
@@ -121,6 +131,11 @@ Widget:
 Golden: `reviews_phone_390.png` (two cards from the PNG: replied one, unreplied one), `reviews_tablet_1280.png` (summary, chips, list, composer open).
 
 ## 10. Task checklist
+
+0. **Pre-flight & Branching (TDD Setup):**
+   - Run `git status` — if uncommitted changes exist, **STOP** and ask the user to commit or stash.
+   - Checkout `dev`, pull latest, and branch: `git checkout dev && git pull origin dev && git checkout -b feature/p18-reviews`.
+   - Follow TDD: write failing unit/widget tests first before implementing code.
 
 1. Confirm shell, auth/role provider, Dio interceptors and l10n are merged (else stub behind interfaces).
 2. Add `sb_ui` widgets (star rating, rating bar, skeleton, error/empty, back pill, secondary/danger buttons, tag); each with a small widget test.

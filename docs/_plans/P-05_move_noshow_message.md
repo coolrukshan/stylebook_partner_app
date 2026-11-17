@@ -2,6 +2,16 @@
 - Spec: [docs/_specs/P-05_move_noshow_message.md](../_specs/P-05_move_noshow_message.md)
 - PNGs: `mobile/P-05_move_booking.png`, `mobile/P-05_no_show_confirm.png`
 
+> [!IMPORTANT]
+> **Prerequisites & Development Workflow:**
+> 1. **Check Git Status:** Before starting, run `git status`. If there are any uncommitted changes, **STOP** and ask the user to commit or stash them. Do not proceed on a dirty working tree.
+> 2. **Branch from `dev`:** Every plan must start on a new branch created from the `dev` branch (`git checkout dev && git pull origin dev && git checkout -b feature/p05-move-noshow-message`). Never build directly on `dev` or `main`.
+> 3. **TDD (Test-Driven Development):** Strictly follow TDD:
+>    - Write failing unit/widget tests first (Red).
+>    - Implement minimal code to make tests pass (Green).
+>    - Refactor while keeping all tests passing (Refactor).
+>    - Verify with `flutter test` and `flutter analyze` before marking complete.
+
 ## 1. Summary and dependencies
 Three flows inside the P-04 booking sheet (no own route): Move (free-time chips from the slots API, then reschedule), No-show (confirm panel with fee text, red confirm) and Message (in-app thread with the client). Feature folder `features/booking_detail/` (sub-folders `move/`, `no_show/`, `message/`).
 Depends on: P-04 (sheet container, `BookingVisibleActions`, detail controller, action controller), P-02 (`BookingActionsRepository`, `BookingAction`, `SbDangerButton`, `SbSecondaryButton`, `SbSkeleton`, `SbErrorBanner`), P-01 (interceptors, session `salonId`, `SbFormat`). Reuses P-06's `AvailabilityRepository` (slots call); whichever plan lands first creates it in `features/booking_detail/data/availability_repository.dart` (or a shared `core` location agreed with P-06; recommend `apps/partner/lib/shared/availability/`).
@@ -74,6 +84,12 @@ Widget
 Golden: `move_panel_390.png`, `no_show_confirm_390.png`, `message_sheet_390.png`, `move_panel_1280.png`.
 
 ## 10. Task checklist
+
+0. **Pre-flight & Branching (TDD Setup):**
+   - Run `git status` — if uncommitted changes exist, **STOP** and ask the user to commit or stash.
+   - Checkout `dev`, pull latest, and branch: `git checkout dev && git pull origin dev && git checkout -b feature/p05-move-noshow-message`.
+   - Follow TDD: write failing unit/widget tests first before implementing code.
+
 1. Shared `AvailabilityRepository` + models + tests (coordinate with P-06).
 2. `sb_ui`: slot chip tint, `SbMessageBubble`, `SbComposer` + tests.
 3. Reschedule and no-show repositories; settings rules provider; tests.

@@ -3,6 +3,16 @@
 - Spec: [docs/_specs/P-20_clients_due_back.md](../_specs/P-20_clients_due_back.md)
 - Design: no PNG (web). Phone is not in More; narrow widths render cards with a bottom action bar.
 
+> [!IMPORTANT]
+> **Prerequisites & Development Workflow:**
+> 1. **Check Git Status:** Before starting, run `git status`. If there are any uncommitted changes, **STOP** and ask the user to commit or stash them. Do not proceed on a dirty working tree.
+> 2. **Branch from `dev`:** Every plan must start on a new branch created from the `dev` branch (`git checkout dev && git pull origin dev && git checkout -b feature/p20-clients-due-back`). Never build directly on `dev` or `main`.
+> 3. **TDD (Test-Driven Development):** Strictly follow TDD:
+>    - Write failing unit/widget tests first (Red).
+>    - Implement minimal code to make tests pass (Green).
+>    - Refactor while keeping all tests passing (Refactor).
+>    - Verify with `flutter test` and `flutter analyze` before marking complete.
+
 ## 1. Summary and dependencies
 
 List clients overdue for a return, filter by minimum overdue days, select up to 50 eligible clients and send a nudge. Server enforces caps, opt-out, quiet hours; the app only reports `skipped` and `warnings`.
@@ -100,6 +110,11 @@ Widget:
 Golden: `due_back_1280.png` (summary chips, table with 3 rows incl. ineligible and nudged, selection bar with 2 selected); `due_back_390.png` (cards and bottom bar).
 
 ## 10. Task checklist
+
+0. **Pre-flight & Branching (TDD Setup):**
+   - Run `git status` — if uncommitted changes exist, **STOP** and ask the user to commit or stash.
+   - Checkout `dev`, pull latest, and branch: `git checkout dev && git pull origin dev && git checkout -b feature/p20-clients-due-back`.
+   - Follow TDD: write failing unit/widget tests first before implementing code.
 
 1. Confirm shell/auth/session `salonId`, Dio, l10n are available.
 2. Add `sb_ui` pieces (avatar, tag, selection bar, banner, skeleton) with tests.

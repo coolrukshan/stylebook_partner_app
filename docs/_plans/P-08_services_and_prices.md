@@ -3,6 +3,16 @@
 - Spec: [docs/_specs/P-08_services_and_prices.md](../_specs/P-08_services_and_prices.md)
 - Design: `mobile/P-08_services_and_prices.png` (back glass button, title, white cards with name, "30 min · Kasun, Dilan", `-` price `+` stepper, footer note). Editor, packages and home-visit panels extend beyond the PNG.
 
+> [!IMPORTANT]
+> **Prerequisites & Development Workflow:**
+> 1. **Check Git Status:** Before starting, run `git status`. If there are any uncommitted changes, **STOP** and ask the user to commit or stash them. Do not proceed on a dirty working tree.
+> 2. **Branch from `dev`:** Every plan must start on a new branch created from the `dev` branch (`git checkout dev && git pull origin dev && git checkout -b feature/p08-services-prices`). Never build directly on `dev` or `main`.
+> 3. **TDD (Test-Driven Development):** Strictly follow TDD:
+>    - Write failing unit/widget tests first (Red).
+>    - Implement minimal code to make tests pass (Green).
+>    - Refactor while keeping all tests passing (Refactor).
+>    - Verify with `flutter test` and `flutter analyze` before marking complete.
+
 ## 1. Summary and dependencies
 
 Owner screen to maintain services grouped by category: quick price stepper (staged, debounced PUT), full editor (duration, deposit, options, add-ons, specialists, toggles), delete (soft), packages (list and create), and salon home-visit settings. Phone shows the PNG list; tablet shows grouped rows plus a side-panel editor and tabs.
@@ -121,6 +131,11 @@ Widget:
 Golden: `services_phone_390.png` (matches PNG: 5 cards + footer), `services_wide_1280.png` (grouped rows + editor panel open).
 
 ## 10. Task checklist
+
+0. **Pre-flight & Branching (TDD Setup):**
+   - Run `git status` — if uncommitted changes exist, **STOP** and ask the user to commit or stash.
+   - Checkout `dev`, pull latest, and branch: `git checkout dev && git pull origin dev && git checkout -b feature/p08-services-prices`.
+   - Follow TDD: write failing unit/widget tests first before implementing code.
 
 1. Add/confirm shared widgets in `sb_ui` (`SbStepperButton`, `SbSwitch`, `SbTextField`, `SbSidePanel`, `SbTabs`, `SbDangerButton`, `SbConfirmDialog`, state widgets) with tests and exports.
 2. `Lkr` helper + `SbFormat.money` tests in `sb_core`.

@@ -3,6 +3,16 @@
 - Spec: [docs/_specs/P-09_staff.md](../_specs/P-09_staff.md)
 - Design: `mobile/P-09_staff.png` (title "Staff", amber "+ Add staff" top-right, white cards: avatar initials, name, "title · hours", status pill).
 
+> [!IMPORTANT]
+> **Prerequisites & Development Workflow:**
+> 1. **Check Git Status:** Before starting, run `git status`. If there are any uncommitted changes, **STOP** and ask the user to commit or stash them. Do not proceed on a dirty working tree.
+> 2. **Branch from `dev`:** Every plan must start on a new branch created from the `dev` branch (`git checkout dev && git pull origin dev && git checkout -b feature/p09-staff`). Never build directly on `dev` or `main`.
+> 3. **TDD (Test-Driven Development):** Strictly follow TDD:
+>    - Write failing unit/widget tests first (Red).
+>    - Implement minimal code to make tests pass (Green).
+>    - Refactor while keeping all tests passing (Refactor).
+>    - Verify with `flutter test` and `flutter analyze` before marking complete.
+
 ## 1. Summary and dependencies
 
 Staff tab: paged list of active team members with avatar, name, title, today's hours and a status pill (With client, Free, On leave, Day off), entry points to P-11 (detail) and P-10 (add). This plan OWNS the shared staff data layer (`features/staff/data/staff_repository.dart`, models, providers) that P-10, P-11 and P-12 extend.
@@ -103,6 +113,11 @@ Widget:
 Golden: `staff_phone_390.png` (compare with PNG: 4 cards), `staff_wide_1280.png` (grid).
 
 ## 10. Task checklist
+
+0. **Pre-flight & Branching (TDD Setup):**
+   - Run `git status` — if uncommitted changes exist, **STOP** and ask the user to commit or stash.
+   - Checkout `dev`, pull latest, and branch: `git checkout dev && git pull origin dev && git checkout -b feature/p09-staff`.
+   - Follow TDD: write failing unit/widget tests first before implementing code.
 
 1. Add `sb_ui` widgets (`SbAvatar`, `SbPill`, `SbPageHeader`, `SbSkeleton`, `SbEmptyState`, `SbErrorPanel`) with widget tests and exports.
 2. `SbFormat.time12`, `ApiError.retryAfter` in `sb_core` with tests.

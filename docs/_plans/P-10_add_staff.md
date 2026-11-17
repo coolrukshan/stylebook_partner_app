@@ -3,6 +3,16 @@
 - Spec: [docs/_specs/P-10_add_staff.md](../_specs/P-10_add_staff.md)
 - Design: `mobile/P-10_add_staff.png` (back circle, "Add staff member", Full name, Mobile number, Role chips, "Copy details from" radio list, helper text, full-width black "Add to team").
 
+> [!IMPORTANT]
+> **Prerequisites & Development Workflow:**
+> 1. **Check Git Status:** Before starting, run `git status`. If there are any uncommitted changes, **STOP** and ask the user to commit or stash them. Do not proceed on a dirty working tree.
+> 2. **Branch from `dev`:** Every plan must start on a new branch created from the `dev` branch (`git checkout dev && git pull origin dev && git checkout -b feature/p10-add-staff`). Never build directly on `dev` or `main`.
+> 3. **TDD (Test-Driven Development):** Strictly follow TDD:
+>    - Write failing unit/widget tests first (Red).
+>    - Implement minimal code to make tests pass (Green).
+>    - Refactor while keeping all tests passing (Refactor).
+>    - Verify with `flutter test` and `flutter analyze` before marking complete.
+
 ## 1. Summary and dependencies
 
 Form to add a team member with name, mobile, role chip and an optional "copy hours and services from" source. Full screen on phone, centred modal (max width ~560) on tablet/web. On success go to P-11 for the new id with a toast.
@@ -103,6 +113,11 @@ Widget:
 Golden: `add_staff_phone_390.png` (compare with PNG), `add_staff_dialog_1280.png`.
 
 ## 10. Task checklist
+
+0. **Pre-flight & Branching (TDD Setup):**
+   - Run `git status` — if uncommitted changes exist, **STOP** and ask the user to commit or stash.
+   - Checkout `dev`, pull latest, and branch: `git checkout dev && git pull origin dev && git checkout -b feature/p10-add-staff`.
+   - Follow TDD: write failing unit/widget tests first before implementing code.
 
 1. `PhoneNumber.normalizeLk` in `sb_core` + tests.
 2. `sb_ui` `SbRadioTile`, `SbTextField` (if missing) + tests.
