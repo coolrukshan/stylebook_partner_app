@@ -1,0 +1,7 @@
+.dart_tool/
+build/
+.flutter-plugins*
+.idea/
+.DS_Store
+*.iml
+.claude/settings.local.json

@@ -1,0 +1,9 @@
+name: stylebook_partner_workspace
+publish_to: none
+environment:
+  sdk: ^3.9.0
+workspace:
+  - apps/partner
+  - packages/sb_ui
+  - packages/sb_core
+  - packages/sb_api
