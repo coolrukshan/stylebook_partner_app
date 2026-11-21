@@ -44,12 +44,13 @@ class ChangePasswordState {
     String? bannerMessage,
     int? passwordResetSignal,
     bool clearErrors = false,
+    bool clearConfirmError = false,
   }) => ChangePasswordState(
     submitting: submitting ?? this.submitting,
     currentError: clearErrors ? currentError : (currentError ?? this.currentError),
     newError: clearErrors ? newError : (newError ?? this.newError),
     newErrorMessage: clearErrors ? newErrorMessage : (newErrorMessage ?? this.newErrorMessage),
-    confirmError: clearErrors ? confirmError : (confirmError ?? this.confirmError),
+    confirmError: clearErrors || clearConfirmError ? confirmError : (confirmError ?? this.confirmError),
     banner: clearErrors ? banner : (banner ?? this.banner),
     bannerMessage: clearErrors ? bannerMessage : (bannerMessage ?? this.bannerMessage),
     passwordResetSignal: passwordResetSignal ?? this.passwordResetSignal,
@@ -60,6 +61,12 @@ class ChangePasswordState {
 class ChangePasswordController extends Notifier<ChangePasswordState> {
   @override
   ChangePasswordState build() => const ChangePasswordState();
+
+  /// The user edited a password field: the mismatch message no longer applies.
+  void clearConfirmError() {
+    if (state.confirmError == null) return;
+    state = state.copyWith(clearConfirmError: true);
+  }
 
   /// Returns true when the password was changed.
   Future<bool> submit({required String current, required String next, required String confirm}) async {

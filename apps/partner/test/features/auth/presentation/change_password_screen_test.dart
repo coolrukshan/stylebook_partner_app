@@ -111,6 +111,18 @@ void main() {
     expect((h.container(tester, Scaffold).read(sessionControllerProvider).value as Full).mustChangePassword, isFalse);
   });
 
+  testWidgets('editing a password field clears the mismatch error', (tester) async {
+    await h.pump(tester, const ChangePasswordScreen());
+    await fill(tester, conf: 'different');
+    await tester.tap(button());
+    await tester.pumpAndSettle();
+    expect(find.text('The passwords do not match.'), findsOneWidget);
+
+    await tester.enterText(confirm(), 'My-New-Passw0rd');
+    await tester.pump();
+    expect(find.text('The passwords do not match.'), findsNothing);
+  });
+
   testWidgets('step-up interrupts the change: the retried call keeps the typed values and the snackbar still shows', (
     tester,
   ) async {

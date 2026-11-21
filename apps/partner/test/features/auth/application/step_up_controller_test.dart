@@ -37,6 +37,18 @@ void main() {
   StepUpState read(ProviderContainer c) => c.read(stepUpControllerProvider);
   StepUpController ctrl(ProviderContainer c) => c.read(stepUpControllerProvider.notifier);
 
+  test('the controller survives a rebuild (invalidate) without a late-init error', () async {
+    final c = await start();
+    await ctrl(c).send();
+    expect(read(c).resendSecondsLeft, greaterThan(0));
+
+    c.invalidate(stepUpControllerProvider);
+    expect(read(c).resendSecondsLeft, 0);
+
+    await ctrl(c).send();
+    expect(read(c).resendSecondsLeft, greaterThan(0));
+  });
+
   group('send', () {
     test('ensureSent sends once, keeps phone_masked and starts the resend countdown from retry_after', () async {
       repo.sendResult = const PartnerOtpSendResponse(phoneMasked: '+9477***4567', retryAfter: 45);

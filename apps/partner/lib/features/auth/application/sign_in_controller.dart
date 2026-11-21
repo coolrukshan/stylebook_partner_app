@@ -58,16 +58,18 @@ class SignInState {
 
 /// Username + password sign in. Holds no password: it is passed through and dropped.
 class SignInController extends Notifier<SignInState> {
-  late final Countdown _lock;
+  Countdown? _lock;
 
   @override
   SignInState build() {
-    _lock = Countdown((left) {
+    _lock?.stop();
+    final lock = Countdown((left) {
       if (!ref.mounted) return;
       final expired = left == 0 && (state.error == SignInError.accountLocked || state.error == SignInError.rateLimited);
       state = state.copyWith(lockSecondsLeft: left, clearError: expired);
     });
-    ref.onDispose(_lock.stop);
+    _lock = lock;
+    ref.onDispose(lock.stop);
     return const SignInState();
   }
 
@@ -125,7 +127,7 @@ class SignInController extends Notifier<SignInState> {
       serverMessage: message,
       passwordResetSignal: resetPassword ? state.passwordResetSignal + 1 : null,
     );
-    if (seconds > 0) _lock.start(seconds);
+    if (seconds > 0) _lock?.start(seconds);
   }
 }
 

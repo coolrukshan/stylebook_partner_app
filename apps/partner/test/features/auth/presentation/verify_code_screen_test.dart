@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:sb_core/sb_core.dart';
 import 'package:sb_ui/sb_ui.dart';
 import 'package:stylebook_partner/features/auth/application/providers.dart';
 import 'package:stylebook_partner/features/auth/application/session_controller.dart';
@@ -153,6 +154,22 @@ void main() {
     await tester.pumpAndSettle();
     expect(h.repo.sendCalls, 2);
     expect(find.textContaining('could not send'), findsNothing);
+  });
+
+  testWidgets('Retry is enabled for every retryable failure', (tester) async {
+    for (final error in [
+      apiError(502, 'SMS_DELIVERY_FAILED'),
+      apiError(503, 'RATE_LIMIT_UNAVAILABLE'),
+      ApiError.offline(),
+    ]) {
+      h = ScreenHarness(tier: 'limited');
+      h.repo.sendError = error;
+      await h.pump(tester, const VerifyCodeScreen());
+      final retry = find.widgetWithText(TextButton, 'Retry');
+      expect(retry, findsOneWidget);
+      expect(tester.widget<TextButton>(retry).onPressed, isNotNull);
+      expect(tester.getSize(retry).height, greaterThanOrEqualTo(44));
+    }
   });
 
   testWidgets('OTP boxes have localised digit labels', (tester) async {

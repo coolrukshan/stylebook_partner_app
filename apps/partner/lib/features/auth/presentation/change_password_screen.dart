@@ -93,7 +93,10 @@ class _ChangePasswordScreenState extends ConsumerState<ChangePasswordScreen> {
                 textInputAction: TextInputAction.next,
                 autofillHints: const [AutofillHints.password],
                 errorText: state.currentError == null ? null : l10n.errCurrentPasswordWrong,
-                onChanged: (_) => setState(() {}),
+                onChanged: (_) {
+                  ref.read(changePasswordControllerProvider.notifier).clearConfirmError();
+                  setState(() {});
+                },
               ),
               const SizedBox(height: SbTokens.gap16),
               SbPasswordField(
@@ -106,7 +109,10 @@ class _ChangePasswordScreenState extends ConsumerState<ChangePasswordScreen> {
                 textInputAction: TextInputAction.next,
                 autofillHints: const [AutofillHints.newPassword],
                 errorText: newError,
-                onChanged: (_) => setState(() {}),
+                onChanged: (_) {
+                  ref.read(changePasswordControllerProvider.notifier).clearConfirmError();
+                  setState(() {});
+                },
               ),
               const SizedBox(height: SbTokens.gap8),
               Text(l10n.passwordPolicyHint, style: context.text.bodySmall!.copyWith(color: SbColors.muted)),
@@ -121,7 +127,10 @@ class _ChangePasswordScreenState extends ConsumerState<ChangePasswordScreen> {
                 textInputAction: TextInputAction.done,
                 autofillHints: const [AutofillHints.newPassword],
                 errorText: state.confirmError == null ? null : l10n.errPasswordMismatch,
-                onChanged: (_) => setState(() {}),
+                onChanged: (_) {
+                  ref.read(changePasswordControllerProvider.notifier).clearConfirmError();
+                  setState(() {});
+                },
                 onFieldSubmitted: (_) => _filled && !state.submitting ? _submit() : null,
               ),
               const SizedBox(height: SbTokens.gap24),

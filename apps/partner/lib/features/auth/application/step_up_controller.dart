@@ -69,15 +69,18 @@ class StepUpState {
 
 /// Backend-enforced step-up: send the SMS code, verify it, upgrade to a full session.
 class StepUpController extends Notifier<StepUpState> {
-  late final Countdown _countdown;
+  Countdown? _countdown;
   var _autoSent = false;
 
   @override
   StepUpState build() {
-    _countdown = Countdown((left) {
+    _countdown?.stop();
+    _autoSent = false;
+    final countdown = Countdown((left) {
       if (ref.mounted) state = state.copyWith(resendSecondsLeft: left);
     });
-    ref.onDispose(_countdown.stop);
+    _countdown = countdown;
+    ref.onDispose(countdown.stop);
     return const StepUpState();
   }
 
@@ -101,7 +104,7 @@ class StepUpController extends Notifier<StepUpState> {
       final response = await ref.read(authRepositoryProvider).sendOtp();
       if (!ref.mounted) return;
       state = state.copyWith(status: StepUpStatus.idle, phoneMasked: response.phoneMasked);
-      _countdown.start(response.retryAfter);
+      _countdown?.start(response.retryAfter);
     } on ApiError catch (e) {
       _fail(e, forSend: true);
     } catch (_) {
@@ -143,7 +146,7 @@ class StepUpController extends Notifier<StepUpState> {
       case 'OTP_INVALID':
         _setError(StepUpError.invalidCode, clearBoxes: true);
       case 'OTP_EXPIRED':
-        _countdown.stop();
+        _countdown?.stop();
         _setError(StepUpError.expired, seconds: 0);
       case 'OTP_MAX_ATTEMPTS':
         _setError(StepUpError.maxAttempts, seconds: retryAfter, clearBoxes: true);
@@ -175,7 +178,7 @@ class StepUpController extends Notifier<StepUpState> {
       serverMessage: message,
       clearSignal: clearBoxes ? state.clearSignal + 1 : null,
     );
-    if (seconds != null) _countdown.start(seconds);
+    if (seconds != null) _countdown?.start(seconds);
   }
 }
 

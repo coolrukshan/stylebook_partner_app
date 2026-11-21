@@ -83,7 +83,7 @@ class _VerifyCodeScreenState extends ConsumerState<VerifyCodeScreen> {
               liveRegion: true,
               child: Text(
                 fieldError,
-                style: context.text.bodySmall!.copyWith(color: SbColors.danger, fontWeight: FontWeight.w500),
+                style: context.text.bodySmall!.copyWith(color: SbColors.danger, fontWeight: SbTokens.weightMedium),
               ),
             ),
           ],

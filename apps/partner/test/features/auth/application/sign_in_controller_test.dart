@@ -41,6 +41,20 @@ void main() {
     expect(c.read(sessionControllerProvider).value, isA<Limited>());
   });
 
+  test('the controller survives a rebuild (invalidate) and keeps counting down safely', () async {
+    final c = await start();
+    repo.loginError = apiError(429, 'ACCOUNT_LOCKED', retryAfter: 30);
+    await ctrl(c).submit('nimal', 'pw');
+    expect(read(c).isLocked, isTrue);
+
+    c.invalidate(signInControllerProvider);
+    expect(read(c).isLocked, isFalse);
+
+    repo.loginError = apiError(429, 'ACCOUNT_LOCKED', retryAfter: 10);
+    await ctrl(c).submit('nimal', 'pw');
+    expect(read(c).lockSecondsLeft, 10);
+  });
+
   test('empty username or password makes no request', () async {
     final c = await start();
     await ctrl(c).submit('', 'pw');
