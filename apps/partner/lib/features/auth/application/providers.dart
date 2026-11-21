@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:dio/dio.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:sb_api/sb_api.dart';
@@ -5,6 +7,7 @@ import 'package:sb_core/sb_core.dart';
 
 import '../data/auth_repository.dart';
 import 'session_controller.dart';
+import 'step_up_coordinator.dart';
 
 /// Epoch counter bumped whenever a session expires or user signs out.
 class SessionEpochNotifier extends Notifier<int> {
@@ -19,30 +22,27 @@ final sessionEpochProvider = NotifierProvider<SessionEpochNotifier, int>(Session
 /// Secure token storage provider.
 final tokenStorageProvider = Provider<TokenStorage>((ref) => const SecureTokenStorage());
 
-/// Configured Dio instance with auth and salon header interceptors.
+/// Configured Dio instance with auth, OTP_REQUIRED and salon header interceptors.
 final dioProvider = Provider<Dio>((ref) {
   final tokenStorage = ref.watch(tokenStorageProvider);
   return buildDio(
     tokenStorage: tokenStorage,
-    onSessionExpired: (_) {
-      ref.read(sessionEpochProvider.notifier).increment();
-      ref.invalidate(sessionControllerProvider);
-    },
+    onSessionExpired: (code) => unawaited(ref.read(sessionControllerProvider.notifier).expire(code)),
+    onOtpRequired: () => ref.read(stepUpCoordinatorProvider.notifier).request(),
     salonIdProvider: () => ref.read(currentUserProvider)?.salonId,
   );
 });
 
 /// Auth repository provider.
 final authRepositoryProvider = Provider<AuthRepository>((ref) {
-  return AuthRepository(
-    dio: ref.watch(dioProvider),
-    tokenStorage: ref.watch(tokenStorageProvider),
-  );
+  return AuthRepository(dio: ref.watch(dioProvider), tokenStorage: ref.watch(tokenStorageProvider));
 });
 
 /// Session controller provider.
-final sessionControllerProvider =
-    AsyncNotifierProvider<SessionController, AuthState>(SessionController.new);
+final sessionControllerProvider = AsyncNotifierProvider<SessionController, AuthState>(SessionController.new);
+
+/// True while a call is parked waiting for the user to verify their phone.
+final stepUpCoordinatorProvider = NotifierProvider<StepUpCoordinator, bool>(StepUpCoordinator.new);
 
 /// Convenience provider for current authenticated user.
 final currentUserProvider = Provider<SessionUser?>((ref) {

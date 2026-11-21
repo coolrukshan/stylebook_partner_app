@@ -61,17 +61,15 @@ import 'app_localizations_en.dart';
 /// be consistent with the languages listed in the AppLocalizations.supportedLocales
 /// property.
 abstract class AppLocalizations {
-  AppLocalizations(String locale)
-    : localeName = intl.Intl.canonicalizedLocale(locale.toString());
+  AppLocalizations(String locale) : localeName = intl.Intl.canonicalizedLocale(locale.toString());
 
   final String localeName;
 
-  static AppLocalizations? of(BuildContext context) {
-    return Localizations.of<AppLocalizations>(context, AppLocalizations);
+  static AppLocalizations of(BuildContext context) {
+    return Localizations.of<AppLocalizations>(context, AppLocalizations)!;
   }
 
-  static const LocalizationsDelegate<AppLocalizations> delegate =
-      _AppLocalizationsDelegate();
+  static const LocalizationsDelegate<AppLocalizations> delegate = _AppLocalizationsDelegate();
 
   /// A list of this localizations delegate along with the default localizations
   /// delegates.
@@ -83,13 +81,12 @@ abstract class AppLocalizations {
   /// Additional delegates can be added by appending to this list in
   /// MaterialApp. This list does not have to be used at all if a custom list
   /// of delegates is preferred or required.
-  static const List<LocalizationsDelegate<dynamic>> localizationsDelegates =
-      <LocalizationsDelegate<dynamic>>[
-        delegate,
-        GlobalMaterialLocalizations.delegate,
-        GlobalCupertinoLocalizations.delegate,
-        GlobalWidgetsLocalizations.delegate,
-      ];
+  static const List<LocalizationsDelegate<dynamic>> localizationsDelegates = <LocalizationsDelegate<dynamic>>[
+    delegate,
+    GlobalMaterialLocalizations.delegate,
+    GlobalCupertinoLocalizations.delegate,
+    GlobalWidgetsLocalizations.delegate,
+  ];
 
   /// A list of this localizations delegate's supported locales.
   static const List<Locale> supportedLocales = <Locale>[Locale('en')];
@@ -100,6 +97,30 @@ abstract class AppLocalizations {
   /// **'StyleBook Partner'**
   String get appTitle;
 
+  /// Spoken label of the launch spinner
+  ///
+  /// In en, this message translates to:
+  /// **'Loading'**
+  String get loadingSession;
+
+  /// No description provided for @todayTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Today'**
+  String get todayTitle;
+
+  /// No description provided for @todayScaffoldReady.
+  ///
+  /// In en, this message translates to:
+  /// **'Partner app scaffold ready.'**
+  String get todayScaffoldReady;
+
+  /// No description provided for @staffListPlaceholder.
+  ///
+  /// In en, this message translates to:
+  /// **'Staff'**
+  String get staffListPlaceholder;
+
   /// No description provided for @signInTitle.
   ///
   /// In en, this message translates to:
@@ -109,98 +130,86 @@ abstract class AppLocalizations {
   /// No description provided for @signInSubtitle.
   ///
   /// In en, this message translates to:
-  /// **'Enter your mobile number to receive a one-time verification code.'**
+  /// **'Enter the username and password from your salon.'**
   String get signInSubtitle;
 
-  /// No description provided for @phoneLabel.
+  /// No description provided for @usernameLabel.
   ///
   /// In en, this message translates to:
-  /// **'Mobile number'**
-  String get phoneLabel;
+  /// **'Username'**
+  String get usernameLabel;
 
-  /// No description provided for @phoneHint.
+  /// No description provided for @passwordLabel.
   ///
   /// In en, this message translates to:
-  /// **'77 123 4567'**
-  String get phoneHint;
+  /// **'Password'**
+  String get passwordLabel;
 
-  /// No description provided for @sendCode.
+  /// No description provided for @showPassword.
   ///
   /// In en, this message translates to:
-  /// **'Send code'**
-  String get sendCode;
+  /// **'Show password'**
+  String get showPassword;
 
-  /// No description provided for @verifyCode.
+  /// No description provided for @hidePassword.
   ///
   /// In en, this message translates to:
-  /// **'Verify code'**
-  String get verifyCode;
+  /// **'Hide password'**
+  String get hidePassword;
 
-  /// No description provided for @otpTitle.
+  /// No description provided for @signIn.
   ///
   /// In en, this message translates to:
-  /// **'Verification code'**
-  String get otpTitle;
+  /// **'Sign in'**
+  String get signIn;
 
-  /// No description provided for @otpSentTo.
+  /// No description provided for @forgotPasswordHint.
   ///
   /// In en, this message translates to:
-  /// **'Enter the 6-digit code sent to {phone}'**
-  String otpSentTo(String phone);
+  /// **'Forgot password? Ask your salon owner or StyleBook support.'**
+  String get forgotPasswordHint;
 
-  /// No description provided for @otpDigitSemantics.
+  /// No description provided for @errInvalidCredentials.
   ///
   /// In en, this message translates to:
-  /// **'Digit {index} of {total}'**
-  String otpDigitSemantics(int index, int total);
+  /// **'Username or password is incorrect.'**
+  String get errInvalidCredentials;
 
-  /// No description provided for @resendCode.
+  /// No description provided for @errAccountLocked.
   ///
   /// In en, this message translates to:
-  /// **'Resend code'**
-  String get resendCode;
+  /// **'Too many attempts. Try again in {time}.'**
+  String errAccountLocked(String time);
 
-  /// No description provided for @resendIn.
+  /// No description provided for @errRateLimited.
   ///
   /// In en, this message translates to:
-  /// **'Resend code in {time}'**
-  String resendIn(String time);
+  /// **'Too many requests. Please try again shortly.'**
+  String get errRateLimited;
 
-  /// No description provided for @changeNumber.
+  /// No description provided for @errAccountSuspended.
   ///
   /// In en, this message translates to:
-  /// **'Change number'**
-  String get changeNumber;
+  /// **'This account is suspended. Contact StyleBook support.'**
+  String get errAccountSuspended;
 
-  /// No description provided for @errPhoneInvalid.
+  /// No description provided for @errAccountDisabled.
   ///
   /// In en, this message translates to:
-  /// **'Please enter a valid Sri Lankan mobile number'**
-  String get errPhoneInvalid;
+  /// **'This account has been disabled. Contact your salon owner or StyleBook support.'**
+  String get errAccountDisabled;
 
-  /// No description provided for @errOtpWrong.
+  /// No description provided for @errNotSalonMember.
   ///
   /// In en, this message translates to:
-  /// **'The code you entered is incorrect. Please try again.'**
-  String get errOtpWrong;
+  /// **'This account has no salon access.'**
+  String get errNotSalonMember;
 
-  /// No description provided for @errOtpExpired.
+  /// No description provided for @errRateLimitUnavailable.
   ///
   /// In en, this message translates to:
-  /// **'This code has expired. Please request a new one.'**
-  String get errOtpExpired;
-
-  /// No description provided for @errTooManyRequests.
-  ///
-  /// In en, this message translates to:
-  /// **'Too many attempts. Please try again in {seconds} seconds.'**
-  String errTooManyRequests(int seconds);
-
-  /// No description provided for @errNotRegistered.
-  ///
-  /// In en, this message translates to:
-  /// **'This mobile number is not registered with a salon.'**
-  String get errNotRegistered;
+  /// **'Service temporarily unavailable. Please try again.'**
+  String get errRateLimitUnavailable;
 
   /// No description provided for @errSessionExpired.
   ///
@@ -220,12 +229,6 @@ abstract class AppLocalizations {
   /// **'A server error occurred. Please try again later.'**
   String get errServer;
 
-  /// No description provided for @errSmsProviderDown.
-  ///
-  /// In en, this message translates to:
-  /// **'SMS delivery is currently unavailable. Please try again later.'**
-  String get errSmsProviderDown;
-
   /// No description provided for @retry.
   ///
   /// In en, this message translates to:
@@ -237,6 +240,162 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Sign out'**
   String get signOut;
+
+  /// No description provided for @cancel.
+  ///
+  /// In en, this message translates to:
+  /// **'Cancel'**
+  String get cancel;
+
+  /// No description provided for @verifyTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Verify your phone'**
+  String get verifyTitle;
+
+  /// No description provided for @verifySubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'We sent a 6-digit code to {phone}.'**
+  String verifySubtitle(String phone);
+
+  /// No description provided for @verifySubtitlePending.
+  ///
+  /// In en, this message translates to:
+  /// **'Sending a code to the phone on your account.'**
+  String get verifySubtitlePending;
+
+  /// No description provided for @verifyCode.
+  ///
+  /// In en, this message translates to:
+  /// **'Verify'**
+  String get verifyCode;
+
+  /// No description provided for @otpDigitSemantics.
+  ///
+  /// In en, this message translates to:
+  /// **'Digit {index} of {total}'**
+  String otpDigitSemantics(int index, int total);
+
+  /// No description provided for @resendCode.
+  ///
+  /// In en, this message translates to:
+  /// **'Resend code'**
+  String get resendCode;
+
+  /// No description provided for @resendIn.
+  ///
+  /// In en, this message translates to:
+  /// **'Resend code in {time}'**
+  String resendIn(String time);
+
+  /// No description provided for @errOtpInvalid.
+  ///
+  /// In en, this message translates to:
+  /// **'That code is not right.'**
+  String get errOtpInvalid;
+
+  /// No description provided for @errOtpExpired.
+  ///
+  /// In en, this message translates to:
+  /// **'This code has expired. Send a new code.'**
+  String get errOtpExpired;
+
+  /// No description provided for @errOtpMaxAttempts.
+  ///
+  /// In en, this message translates to:
+  /// **'Too many wrong codes. Send a new code.'**
+  String get errOtpMaxAttempts;
+
+  /// No description provided for @errNoPendingCode.
+  ///
+  /// In en, this message translates to:
+  /// **'No code is waiting. Send a new code.'**
+  String get errNoPendingCode;
+
+  /// No description provided for @errNoPhoneOnAccount.
+  ///
+  /// In en, this message translates to:
+  /// **'No mobile number on this account. Contact StyleBook support.'**
+  String get errNoPhoneOnAccount;
+
+  /// No description provided for @errSmsFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'We could not send the SMS. Please try again.'**
+  String get errSmsFailed;
+
+  /// No description provided for @errOtpRequired.
+  ///
+  /// In en, this message translates to:
+  /// **'Verify your phone to continue.'**
+  String get errOtpRequired;
+
+  /// No description provided for @changePasswordTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Set a new password'**
+  String get changePasswordTitle;
+
+  /// No description provided for @changePasswordSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose a new password to continue.'**
+  String get changePasswordSubtitle;
+
+  /// No description provided for @currentPasswordLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Current password'**
+  String get currentPasswordLabel;
+
+  /// No description provided for @newPasswordLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'New password'**
+  String get newPasswordLabel;
+
+  /// No description provided for @confirmPasswordLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Confirm new password'**
+  String get confirmPasswordLabel;
+
+  /// No description provided for @passwordPolicyHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose a strong password that you do not use anywhere else.'**
+  String get passwordPolicyHint;
+
+  /// No description provided for @errCurrentPasswordWrong.
+  ///
+  /// In en, this message translates to:
+  /// **'Current password is incorrect.'**
+  String get errCurrentPasswordWrong;
+
+  /// No description provided for @errPasswordMismatch.
+  ///
+  /// In en, this message translates to:
+  /// **'The passwords do not match.'**
+  String get errPasswordMismatch;
+
+  /// No description provided for @errWeakPassword.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose a stronger password.'**
+  String get errWeakPassword;
+
+  /// No description provided for @savePassword.
+  ///
+  /// In en, this message translates to:
+  /// **'Change password'**
+  String get savePassword;
+
+  /// No description provided for @passwordChanged.
+  ///
+  /// In en, this message translates to:
+  /// **'Password changed. Other devices were signed out.'**
+  String get passwordChanged;
 
   /// No description provided for @roleOwner.
   ///
@@ -257,8 +416,7 @@ abstract class AppLocalizations {
   String get roleSpecialist;
 }
 
-class _AppLocalizationsDelegate
-    extends LocalizationsDelegate<AppLocalizations> {
+class _AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> {
   const _AppLocalizationsDelegate();
 
   @override
@@ -267,8 +425,7 @@ class _AppLocalizationsDelegate
   }
 
   @override
-  bool isSupported(Locale locale) =>
-      <String>['en'].contains(locale.languageCode);
+  bool isSupported(Locale locale) => <String>['en'].contains(locale.languageCode);
 
   @override
   bool shouldReload(_AppLocalizationsDelegate old) => false;

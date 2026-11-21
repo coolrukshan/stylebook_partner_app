@@ -59,4 +59,10 @@ abstract final class SbFormat {
     final salonTime = SalonClock.toSalonTime(utc, timeZone);
     return _dayLabelFormat.format(salonTime);
   }
+
+  /// Formats a number of seconds as a countdown: `125` -> `2:05`.
+  static String countdown(int seconds) {
+    final safe = seconds < 0 ? 0 : seconds;
+    return '${safe ~/ 60}:${(safe % 60).toString().padLeft(2, '0')}';
+  }
 }

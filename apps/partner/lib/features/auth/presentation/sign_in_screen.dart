@@ -1,114 +1,118 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:sb_ui/sb_ui.dart';
 
 import '../../../l10n/app_localizations.dart';
-import '../application/otp_controller.dart';
 import '../application/providers.dart';
 import '../application/session_controller.dart';
-import 'widgets/otp_step.dart';
-import 'widgets/phone_step.dart';
+import '../application/sign_in_controller.dart';
+import 'auth_error_text.dart';
+import 'widgets/auth_header.dart';
 
-/// Screen for salon partner mobile OTP sign-in.
-class SignInScreen extends ConsumerWidget {
+/// Username + password sign in. No tabs, no phone, no sign-up: accounts are created by StyleBook.
+class SignInScreen extends ConsumerStatefulWidget {
   const SignInScreen({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<SignInScreen> createState() => _SignInScreenState();
+}
+
+class _SignInScreenState extends ConsumerState<SignInScreen> {
+  final _username = TextEditingController();
+  final _password = TextEditingController();
+  final _passwordFocus = FocusNode();
+
+  @override
+  void dispose() {
+    _username.dispose();
+    _password.dispose();
+    _passwordFocus.dispose();
+    super.dispose();
+  }
+
+  bool get _filled => _username.text.trim().isNotEmpty && _password.text.isNotEmpty;
+
+  void _submit() {
+    TextInput.finishAutofillContext();
+    ref.read(signInControllerProvider.notifier).submit(_username.text, _password.text);
+  }
+
+  @override
+  Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
-    final otpState = ref.watch(otpSignInControllerProvider);
-    final sessionAsync = ref.watch(sessionControllerProvider);
+    final state = ref.watch(signInControllerProvider);
 
-    String? bannerMessage;
-    if (otpState.bannerError != null) {
-      if (otpState.bannerError == 'errOffline') {
-        bannerMessage = l10n?.errOffline ?? 'You are offline. Please check your internet connection.';
-      } else if (otpState.bannerError == 'errTooManyRequests') {
-        bannerMessage = l10n?.errTooManyRequests(otpState.resendSecondsLeft) ??
-            'Too many attempts. Please try again later.';
-      } else if (otpState.bannerError == 'errSmsProviderDown') {
-        bannerMessage = l10n?.errSmsProviderDown ?? 'SMS delivery unavailable. Please try again later.';
-      } else if (otpState.bannerError == 'errServer') {
-        bannerMessage = l10n?.errServer ?? 'A server error occurred. Please try again.';
-      } else {
-        bannerMessage = otpState.bannerError;
-      }
-    } else {
-      sessionAsync.whenData((state) {
-        if (state is NoSalonAccess) {
-          bannerMessage = l10n?.errNotRegistered ?? state.message;
-        } else if (state is Unauthenticated && state.reason == 'expired') {
-          bannerMessage = l10n?.errSessionExpired ?? 'Your session has expired. Please sign in again.';
-        }
-      });
-    }
+    ref.listen(signInControllerProvider.select((s) => s.passwordResetSignal), (_, _) {
+      _password.clear();
+      _passwordFocus.requestFocus();
+      setState(() {});
+    });
 
-    final content = Column(
-      mainAxisSize: MainAxisSize.min,
-      crossAxisAlignment: CrossAxisAlignment.stretch,
-      children: [
-        if (bannerMessage != null) ...[
-          SbErrorBanner(message: bannerMessage!),
-          const SizedBox(height: 20),
-        ],
-        AnimatedSwitcher(
-          duration: const Duration(milliseconds: 250),
-          child: otpState.step == OtpStep.phone
-              ? const PhoneStep(key: ValueKey('phone_step'))
-              : const OtpStepWidget(key: ValueKey('otp_step')),
-        ),
-      ],
-    );
+    final signedOut = ref.watch(sessionControllerProvider).value;
+    final banner =
+        AuthErrorText.signIn(l10n, state) ??
+        (signedOut is Unauthenticated ? AuthErrorText.signedOut(l10n, signedOut.reason) : null);
+    final retryable =
+        state.error == SignInError.unavailable ||
+        state.error == SignInError.server ||
+        state.error == SignInError.offline;
 
-    return Scaffold(
-      backgroundColor: SbColors.canvas,
-      body: Stack(
-        children: [
-          // Ambient soft amber glow
-          Positioned.fill(
-            child: DecoratedBox(
-              decoration: BoxDecoration(
-                color: SbColors.canvas,
-                gradient: RadialGradient(
-                  center: const Alignment(0.8, -0.8),
-                  radius: 1.2,
-                  colors: [
-                    SbColors.glowAmber.withValues(alpha: 0.6),
-                    SbColors.canvas,
-                  ],
-                ),
+    final canSubmit = _filled && !state.submitting && !state.isLocked;
+
+    return SbAuthScaffold(
+      child: AutofillGroup(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            AuthHeader(title: l10n.signInTitle, subtitle: l10n.signInSubtitle),
+            if (banner != null) ...[
+              const SizedBox(height: SbTokens.gap20),
+              SbErrorBanner(
+                message: banner,
+                retryLabel: retryable ? l10n.retry : null,
+                onRetry: retryable && _filled ? _submit : null,
               ),
+            ],
+            const SizedBox(height: SbTokens.gap24),
+            SbTextField(
+              controller: _username,
+              label: l10n.usernameLabel,
+              enabled: !state.submitting,
+              autocorrect: false,
+              enableSuggestions: false,
+              maxLength: 50,
+              keyboardType: TextInputType.text,
+              textInputAction: TextInputAction.next,
+              autofillHints: const [AutofillHints.username],
+              onChanged: (_) => setState(() {}),
+              onFieldSubmitted: (_) => _passwordFocus.requestFocus(),
             ),
-          ),
-          SafeArea(
-            child: LayoutBuilder(
-              builder: (context, constraints) {
-                final isTabletOrWeb = constraints.maxWidth >= 900;
-                if (isTabletOrWeb) {
-                  return Center(
-                    child: ConstrainedBox(
-                      constraints: const BoxConstraints(maxWidth: SbTokens.authCardMaxWidth),
-                      child: SbCard(
-                        padding: const EdgeInsets.all(32),
-                        child: content,
-                      ),
-                    ),
-                  );
-                }
-
-                return SingleChildScrollView(
-                  padding: EdgeInsets.fromLTRB(
-                    20,
-                    24,
-                    20,
-                    24 + MediaQuery.viewInsetsOf(context).bottom,
-                  ),
-                  child: content,
-                );
-              },
+            const SizedBox(height: SbTokens.gap16),
+            SbPasswordField(
+              controller: _password,
+              focusNode: _passwordFocus,
+              label: l10n.passwordLabel,
+              showLabel: l10n.showPassword,
+              hideLabel: l10n.hidePassword,
+              enabled: !state.submitting,
+              maxLength: 128,
+              textInputAction: TextInputAction.done,
+              autofillHints: const [AutofillHints.password],
+              onChanged: (_) => setState(() {}),
+              onFieldSubmitted: (_) => _submit(),
             ),
-          ),
-        ],
+            const SizedBox(height: SbTokens.gap24),
+            SbPrimaryButton(label: l10n.signIn, loading: state.submitting, onPressed: canSubmit ? _submit : null),
+            const SizedBox(height: SbTokens.gap20),
+            Text(
+              l10n.forgotPasswordHint,
+              textAlign: TextAlign.center,
+              style: context.text.bodySmall!.copyWith(color: SbColors.muted),
+            ),
+          ],
+        ),
       ),
     );
   }

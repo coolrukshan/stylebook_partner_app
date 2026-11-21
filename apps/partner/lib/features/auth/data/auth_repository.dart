@@ -2,83 +2,82 @@ import 'package:dio/dio.dart';
 import 'package:sb_api/sb_api.dart';
 import 'package:sb_core/sb_core.dart';
 
-import 'models/otp_send_response.dart';
-import 'models/partner_settings_out.dart';
-import 'models/sign_in_response.dart';
+import 'models/partner_full_session_response.dart';
+import 'models/partner_login_response.dart';
+import 'models/partner_otp_send_response.dart';
 import 'models/token_response.dart';
-import 'models/user_out.dart';
 
-/// Repository handling authentication, token management, and salon context bootstrapping.
+/// Partner authentication calls. Every call that issues a token pair REPLACES both stored
+/// tokens. Passwords, codes and tokens are never logged.
 class AuthRepository {
-  AuthRepository({
-    required this.dio,
-    required this.tokenStorage,
-  });
+  AuthRepository({required this.dio, required this.tokenStorage});
 
   final Dio dio;
   final TokenStorage tokenStorage;
 
-  /// Requests a 6-digit OTP code to the provided E.164 phone number.
-  Future<OtpSendResponse> sendOtp(String e164) async {
+  /// `POST /v1/partner/auth/login`: username + password, returns a LIMITED session.
+  Future<PartnerLoginResponse> login(String username, String password) {
     return wrapApiCall(() async {
       final res = await dio.post<Map<String, dynamic>>(
-        '/v1/auth/otp/send',
-        data: {'phone': e164},
+        '/v1/partner/auth/login',
+        data: {'username': username, 'password': password},
       );
-      return OtpSendResponse.fromJson(res.data!);
+      final response = PartnerLoginResponse.fromJson(res.data!);
+      await tokenStorage.saveTokens(accessToken: response.accessToken, refreshToken: response.refreshToken);
+      return response;
     });
   }
 
-  /// Verifies an OTP code and returns access/refresh tokens.
-  Future<SignInResponse> verifyOtp(String e164, String otp) async {
+  /// `POST /v1/partner/auth/otp/send`: SMS to the account phone (Bearer, no body).
+  Future<PartnerOtpSendResponse> sendOtp() {
     return wrapApiCall(() async {
-      final res = await dio.post<Map<String, dynamic>>(
-        '/v1/auth/otp/verify',
-        data: {'phone': e164, 'otp': otp},
-      );
-      return SignInResponse.fromJson(res.data!);
+      final res = await dio.post<Map<String, dynamic>>('/v1/partner/auth/otp/send');
+      return PartnerOtpSendResponse.fromJson(res.data!);
     });
   }
 
-  /// Manually refreshes the session using the stored refresh token.
-  Future<TokenResponse> refresh() async {
+  /// `POST /v1/partner/auth/otp/verify`: upgrades to a FULL session with a NEW token pair.
+  Future<PartnerFullSessionResponse> verifyOtp(String otp) {
+    return wrapApiCall(() async {
+      final res = await dio.post<Map<String, dynamic>>('/v1/partner/auth/otp/verify', data: {'otp': otp});
+      final response = PartnerFullSessionResponse.fromJson(res.data!);
+      await tokenStorage.saveTokens(accessToken: response.accessToken, refreshToken: response.refreshToken);
+      return response;
+    });
+  }
+
+  /// `POST /v1/partner/auth/password/change` (FULL session): NEW token pair, other sessions signed out.
+  Future<PartnerFullSessionResponse> changePassword({required String current, required String next}) {
+    return wrapApiCall(() async {
+      final res = await dio.post<Map<String, dynamic>>(
+        '/v1/partner/auth/password/change',
+        data: {'current_password': current, 'new_password': next},
+      );
+      final response = PartnerFullSessionResponse.fromJson(res.data!);
+      await tokenStorage.saveTokens(accessToken: response.accessToken, refreshToken: response.refreshToken);
+      return response;
+    });
+  }
+
+  /// `POST /v1/auth/refresh`: rotation, so both tokens are stored. The response has no tier.
+  Future<TokenResponse> refresh() {
     return wrapApiCall(() async {
       final refreshToken = await tokenStorage.getRefreshToken();
-      final res = await dio.post<Map<String, dynamic>>(
-        '/v1/auth/refresh',
-        data: {'refresh_token': refreshToken},
-      );
-      return TokenResponse.fromJson(res.data!);
+      final res = await dio.post<Map<String, dynamic>>('/v1/auth/refresh', data: {'refresh_token': refreshToken});
+      final response = TokenResponse.fromJson(res.data!);
+      await tokenStorage.saveTokens(accessToken: response.accessToken, refreshToken: response.refreshToken);
+      return response;
     });
   }
 
-  /// Fetches the profile of the authenticated user.
-  Future<UserOut> me() async {
-    return wrapApiCall(() async {
-      final res = await dio.get<Map<String, dynamic>>('/v1/me');
-      return UserOut.fromJson(res.data!);
-    });
-  }
-
-  /// Loads the salon profile settings (ID, salon name, time zone).
-  Future<PartnerSettingsOut> loadSalonContext() async {
-    return wrapApiCall(() async {
-      final res = await dio.get<Map<String, dynamic>>('/v1/partner/settings');
-      return PartnerSettingsOut.fromJson(res.data!);
-    });
-  }
-
-  /// Signs out: makes best-effort logout call and clears stored tokens and cached user.
+  /// Best-effort `POST /v1/auth/logout`, then clears tokens and the cached user locally.
   Future<void> logout() async {
     final refreshToken = await tokenStorage.getRefreshToken();
     if (refreshToken != null && refreshToken.isNotEmpty) {
       try {
-        await dio.post<dynamic>(
-          '/v1/auth/logout',
-          data: {'refresh_token': refreshToken},
-        );
+        await dio.post<dynamic>('/v1/auth/logout', data: {'refresh_token': refreshToken});
       } catch (_) {
-        // Best effort
+        // Best effort: always clear locally.
       }
     }
     await tokenStorage.clearTokens();

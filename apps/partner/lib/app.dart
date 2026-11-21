@@ -10,11 +10,11 @@ class PartnerApp extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) => MaterialApp.router(
-        title: 'StyleBook Partner',
-        debugShowCheckedModeBanner: false,
-        theme: SbTheme.light(),
-        routerConfig: ref.watch(routerProvider),
-        localizationsDelegates: AppLocalizations.localizationsDelegates,
-        supportedLocales: AppLocalizations.supportedLocales,
-      );
+    onGenerateTitle: (context) => AppLocalizations.of(context).appTitle,
+    debugShowCheckedModeBanner: false,
+    theme: SbTheme.light(),
+    routerConfig: ref.watch(routerProvider),
+    localizationsDelegates: AppLocalizations.localizationsDelegates,
+    supportedLocales: AppLocalizations.supportedLocales,
+  );
 }

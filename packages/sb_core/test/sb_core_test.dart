@@ -67,8 +67,6 @@ void main() {
       const user = SessionUser(
         id: 'u-1',
         fullName: 'Kasun Perera',
-        phone: '+94771234567',
-        avatarUrl: 'https://example.com/avatar.jpg',
         role: Role.owner,
         salonId: 's-1',
         salonName: 'Elegance Salon',
@@ -81,13 +79,15 @@ void main() {
 
       expect(restored.id, equals('u-1'));
       expect(restored.fullName, equals('Kasun Perera'));
-      expect(restored.phone, equals('+94771234567'));
-      expect(restored.avatarUrl, equals('https://example.com/avatar.jpg'));
       expect(restored.role, equals(Role.owner));
       expect(restored.salonId, equals('s-1'));
       expect(restored.salonName, equals('Elegance Salon'));
       expect(restored.timeZone, equals('Asia/Colombo'));
       expect(restored.staffId, equals('st-1'));
+    });
+
+    test('defaults the time zone to Asia/Colombo', () {
+      expect(SessionUser.defaultTimeZone, equals('Asia/Colombo'));
     });
   });
 
@@ -115,6 +115,16 @@ void main() {
 
       await storage.clearCachedUser();
       expect(await storage.getCachedUser(), isNull);
+    });
+  });
+
+  group('SbFormat.countdown', () {
+    test('formats seconds as m:ss', () {
+      expect(SbFormat.countdown(0), '0:00');
+      expect(SbFormat.countdown(7), '0:07');
+      expect(SbFormat.countdown(60), '1:00');
+      expect(SbFormat.countdown(125), '2:05');
+      expect(SbFormat.countdown(-3), '0:00');
     });
   });
 }
