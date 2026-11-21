@@ -75,6 +75,37 @@ void main() {
       expect(error.code, equals('OFFLINE'));
     });
 
+    test('keeps the server code and message on 5xx responses', () {
+      DioException build(int status, Map<String, dynamic> body, [Map<String, List<String>>? headers]) =>
+          DioException(
+            requestOptions: RequestOptions(path: '/v1/partner/auth/otp/send'),
+            response: Response(
+              requestOptions: RequestOptions(path: '/v1/partner/auth/otp/send'),
+              statusCode: status,
+              data: body,
+              headers: Headers.fromMap(headers ?? const {}),
+            ),
+            type: DioExceptionType.badResponse,
+          );
+
+      final sms = ApiError.fromDio(build(502, {
+        'code': 'SMS_DELIVERY_FAILED',
+        'message': 'SMS could not be sent',
+        'field': null,
+      }));
+      expect(sms.code, equals('SMS_DELIVERY_FAILED'));
+      expect(sms.isServer, isTrue);
+      expect(sms.status, equals(502));
+
+      final unavailable = ApiError.fromDio(build(
+        503,
+        {'code': 'RATE_LIMIT_UNAVAILABLE', 'message': 'Try later', 'field': null},
+        {'retry-after': ['30']},
+      ));
+      expect(unavailable.code, equals('RATE_LIMIT_UNAVAILABLE'));
+      expect(unavailable.retryAfter, equals(30));
+    });
+
     test('handles 502/503 server errors', () {
       final dioException = DioException(
         requestOptions: RequestOptions(path: '/v1/me'),

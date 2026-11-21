@@ -4,13 +4,15 @@ import 'package:sb_core/sb_core.dart';
 import 'api_exception_mapper.dart';
 import 'interceptors/auth_interceptor.dart';
 import 'interceptors/idempotency_interceptor.dart';
+import 'interceptors/otp_required_interceptor.dart';
 import 'interceptors/salon_header_interceptor.dart';
 
 /// Builds a configured Dio instance with auth refresh, idempotency, salon header, and exception mapping.
 Dio buildDio({
   String? baseUrl,
   TokenStorage? tokenStorage,
-  void Function()? onSessionExpired,
+  void Function(String? code)? onSessionExpired,
+  Future<bool> Function()? onOtpRequired,
   String? Function()? salonIdProvider,
 }) {
   final base = baseUrl ?? SbConfig.apiBaseUrl;
@@ -38,6 +40,10 @@ Dio buildDio({
 
   if (salonIdProvider != null) {
     dio.interceptors.add(SalonHeaderInterceptor(salonIdProvider: salonIdProvider));
+  }
+
+  if (onOtpRequired != null) {
+    dio.interceptors.add(OtpRequiredInterceptor(dio: dio, onOtpRequired: onOtpRequired));
   }
 
   dio.interceptors.add(ApiExceptionMapper());

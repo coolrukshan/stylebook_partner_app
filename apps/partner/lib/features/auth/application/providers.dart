@@ -24,7 +24,7 @@ final dioProvider = Provider<Dio>((ref) {
   final tokenStorage = ref.watch(tokenStorageProvider);
   return buildDio(
     tokenStorage: tokenStorage,
-    onSessionExpired: () {
+    onSessionExpired: (_) {
       ref.read(sessionEpochProvider.notifier).increment();
       ref.invalidate(sessionControllerProvider);
     },

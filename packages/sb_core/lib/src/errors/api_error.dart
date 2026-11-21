@@ -45,14 +45,6 @@ class ApiError implements Exception {
       return ApiError.offline();
     }
 
-    // Check for server-side errors
-    if (status != null && status >= 500) {
-      return ApiError.server(
-        'A server error occurred. Please try again later.',
-        status,
-      );
-    }
-
     String message = error.message ?? 'An unexpected error occurred.';
     String? code;
     String? field;
@@ -78,12 +70,17 @@ class ApiError implements Exception {
       }
     }
 
-    // Check Retry-After header on 429
-    if (status == 429 && retryAfter == null) {
+    // Check Retry-After header on 429 and 503
+    if ((status == 429 || status == 503) && retryAfter == null) {
       final header = error.response?.headers.value('retry-after');
       if (header != null) {
         retryAfter = int.tryParse(header);
       }
+    }
+
+    final isServer = status != null && status >= 500;
+    if (isServer && code == null) {
+      return ApiError.server('A server error occurred. Please try again later.', status);
     }
 
     return ApiError(
@@ -92,6 +89,7 @@ class ApiError implements Exception {
       field: field,
       status: status,
       retryAfter: retryAfter,
+      isServer: isServer,
     );
   }
 

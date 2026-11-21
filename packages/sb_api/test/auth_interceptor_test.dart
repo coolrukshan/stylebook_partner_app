@@ -9,11 +9,13 @@ void main() {
   late Dio dio;
   late Dio authDio;
   var sessionExpiredCalled = false;
+  String? sessionExpiredCode;
   var refreshCount = 0;
 
   setUp(() {
     tokenStorage = InMemoryTokenStorage();
     sessionExpiredCalled = false;
+    sessionExpiredCode = null;
     refreshCount = 0;
 
     authDio = Dio(BaseOptions(baseUrl: 'https://api.test'));
@@ -22,8 +24,9 @@ void main() {
     final authInterceptor = AuthInterceptor(
       tokenStorage: tokenStorage,
       authDio: authDio,
-      onSessionExpired: () {
+      onSessionExpired: (code) {
         sessionExpiredCalled = true;
+        sessionExpiredCode = code;
       },
     );
 
@@ -151,6 +154,82 @@ void main() {
     expect(sessionExpiredCalled, isTrue);
     expect(await tokenStorage.getAccessToken(), isNull);
     expect(await tokenStorage.getRefreshToken(), isNull);
+  });
+
+  ResponseBody json(String body, int status) => ResponseBody.fromString(
+        body,
+        status,
+        headers: {Headers.contentTypeHeader: [Headers.jsonContentType]},
+      );
+
+  test('does not attach Bearer to the public partner login and never refreshes on its 401', () async {
+    await tokenStorage.saveTokens(accessToken: 'stale', refreshToken: 'stale-refresh');
+    authDio.httpClientAdapter = _MockHttpAdapter((options) async {
+      refreshCount++;
+      return json('{}', 200);
+    });
+    dio.httpClientAdapter = _MockHttpAdapter((options) async {
+      expect(options.headers['Authorization'], isNull);
+      return json('{"code":"INVALID_CREDENTIALS","message":"x","field":null}', 401);
+    });
+
+    await expectLater(
+      dio.post<dynamic>('/v1/partner/auth/login', data: {'username': 'a', 'password': 'b'}),
+      throwsA(isA<DioException>().having((e) => e.response?.statusCode, 'status', 401)),
+    );
+    expect(refreshCount, equals(0));
+    expect(sessionExpiredCalled, isFalse);
+    expect(await tokenStorage.getAccessToken(), equals('stale'));
+  });
+
+  test('attaches Bearer to partner otp endpoints', () async {
+    await tokenStorage.saveTokens(accessToken: 'limited-token', refreshToken: 'r');
+    dio.httpClientAdapter = _MockHttpAdapter((options) async {
+      expect(options.headers['Authorization'], equals('Bearer limited-token'));
+      return json('{}', 200);
+    });
+    final res = await dio.post<dynamic>('/v1/partner/auth/otp/send');
+    expect(res.statusCode, equals(200));
+  });
+
+  test('a network failure during refresh keeps the tokens and does not sign out', () async {
+    await tokenStorage.saveTokens(accessToken: 'expired', refreshToken: 'good-refresh');
+    authDio.httpClientAdapter = _MockHttpAdapter((options) async {
+      throw DioException(requestOptions: options, type: DioExceptionType.connectionError);
+    });
+    dio.httpClientAdapter = _MockHttpAdapter((options) async => json('{}', 401));
+
+    await expectLater(dio.get<dynamic>('/v1/partner/today'), throwsA(isA<DioException>()));
+    expect(sessionExpiredCalled, isFalse);
+    expect(await tokenStorage.getRefreshToken(), equals('good-refresh'));
+  });
+
+  test('refresh rejection passes the API code to onSessionExpired', () async {
+    await tokenStorage.saveTokens(accessToken: 'expired', refreshToken: 'revoked');
+    authDio.httpClientAdapter = _MockHttpAdapter(
+      (options) async => json('{"code":"TOKEN_REVOKED","message":"x","field":null}', 401),
+    );
+    dio.httpClientAdapter = _MockHttpAdapter((options) async => json('{}', 401));
+
+    await expectLater(dio.get<dynamic>('/v1/partner/today'), throwsA(isA<DioException>()));
+    expect(sessionExpiredCode, equals('TOKEN_REVOKED'));
+    expect(await tokenStorage.getAccessToken(), isNull);
+  });
+
+  test('error of the retried request after refresh is surfaced, not the original 401', () async {
+    await tokenStorage.saveTokens(accessToken: 'expired', refreshToken: 'ok');
+    authDio.httpClientAdapter = _MockHttpAdapter((options) async {
+      if (options.path.contains('/v1/auth/refresh')) {
+        return json('{"access_token":"n","refresh_token":"nr"}', 200);
+      }
+      return json('{"code":"OTP_REQUIRED","message":"x","field":null}', 403);
+    });
+    dio.httpClientAdapter = _MockHttpAdapter((options) async => json('{}', 401));
+
+    await expectLater(
+      dio.get<dynamic>('/v1/partner/today'),
+      throwsA(isA<DioException>().having((e) => e.response?.statusCode, 'status', 403)),
+    );
   });
 }
 
