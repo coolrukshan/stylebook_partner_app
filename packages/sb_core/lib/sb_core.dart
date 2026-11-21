@@ -8,4 +8,3 @@ export 'src/config.dart';
 export 'src/errors/api_error.dart';
 export 'src/format/salon_clock.dart';
 export 'src/format/sb_format.dart';
-export 'src/phone/phone.dart';

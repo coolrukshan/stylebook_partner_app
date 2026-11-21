@@ -7,29 +7,6 @@ void main() {
     tz_data.initializeTimeZones();
   });
 
-  group('Phone', () {
-    test('toE164 formats local Sri Lankan numbers correctly', () {
-      expect(Phone.toE164('0771234567'), equals('+94771234567'));
-      expect(Phone.toE164('+94771234567'), equals('+94771234567'));
-      expect(Phone.toE164('94771234567'), equals('+94771234567'));
-      expect(Phone.toE164('077 123 4567'), equals('+94771234567'));
-      expect(Phone.toE164('771234567'), equals('+94771234567'));
-    });
-
-    test('toE164 returns null for invalid numbers', () {
-      expect(Phone.toE164('abc'), isNull);
-      expect(Phone.toE164('07712345'), isNull); // 8 digits
-      expect(Phone.toE164(''), isNull);
-      expect(Phone.toE164('1234567890123456'), isNull);
-    });
-
-    test('isValid validates correctly', () {
-      expect(Phone.isValid('0771234567'), isTrue);
-      expect(Phone.isValid('+94771234567'), isTrue);
-      expect(Phone.isValid('abc'), isFalse);
-    });
-  });
-
   group('SbFormat', () {
     test('money formats cents with no decimals when whole amount', () {
       expect(SbFormat.money(150000), equals('LKR 1,500'));
