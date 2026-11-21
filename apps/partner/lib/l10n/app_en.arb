@@ -1,0 +1,94 @@
+{
+  "@@locale": "en",
+  "appTitle": "StyleBook Partner",
+  "@appTitle": {
+    "description": "Application title"
+  },
+  "loadingSession": "Loading",
+  "@loadingSession": {
+    "description": "Spoken label of the launch spinner"
+  },
+  "todayTitle": "Today",
+  "todayScaffoldReady": "Partner app scaffold ready.",
+  "staffListPlaceholder": "Staff",
+  "signInTitle": "Sign in to your salon",
+  "signInSubtitle": "Enter the username and password from your salon.",
+  "usernameLabel": "Username",
+  "passwordLabel": "Password",
+  "showPassword": "Show password",
+  "hidePassword": "Hide password",
+  "signIn": "Sign in",
+  "forgotPasswordHint": "Forgot password? Ask your salon owner or StyleBook support.",
+  "errInvalidCredentials": "Username or password is incorrect.",
+  "errAccountLocked": "Too many attempts. Try again in {time}.",
+  "@errAccountLocked": {
+    "placeholders": {
+      "time": {
+        "type": "String"
+      }
+    }
+  },
+  "errRateLimited": "Too many requests. Please try again shortly.",
+  "errAccountSuspended": "This account is suspended. Contact StyleBook support.",
+  "errAccountDisabled": "This account has been disabled. Contact your salon owner or StyleBook support.",
+  "errNotSalonMember": "This account has no salon access.",
+  "errRateLimitUnavailable": "Service temporarily unavailable. Please try again.",
+  "errSessionExpired": "Your session has expired. Please sign in again.",
+  "errOffline": "You are offline. Please check your internet connection.",
+  "errServer": "A server error occurred. Please try again later.",
+  "retry": "Retry",
+  "signOut": "Sign out",
+  "cancel": "Cancel",
+  "verifyTitle": "Verify your phone",
+  "verifySubtitle": "We sent a 6-digit code to {phone}.",
+  "@verifySubtitle": {
+    "placeholders": {
+      "phone": {
+        "type": "String"
+      }
+    }
+  },
+  "verifySubtitlePending": "Sending a code to the phone on your account.",
+  "verifyCode": "Verify",
+  "otpDigitSemantics": "Digit {index} of {total}",
+  "@otpDigitSemantics": {
+    "placeholders": {
+      "index": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+  "resendCode": "Resend code",
+  "resendIn": "Resend code in {time}",
+  "@resendIn": {
+    "placeholders": {
+      "time": {
+        "type": "String"
+      }
+    }
+  },
+  "errOtpInvalid": "That code is not right.",
+  "errOtpExpired": "This code has expired. Send a new code.",
+  "errOtpMaxAttempts": "Too many wrong codes. Send a new code.",
+  "errNoPendingCode": "No code is waiting. Send a new code.",
+  "errNoPhoneOnAccount": "No mobile number on this account. Contact StyleBook support.",
+  "errSmsFailed": "We could not send the SMS. Please try again.",
+  "errOtpRequired": "Verify your phone to continue.",
+  "changePasswordTitle": "Set a new password",
+  "changePasswordSubtitle": "Choose a new password to continue.",
+  "currentPasswordLabel": "Current password",
+  "newPasswordLabel": "New password",
+  "confirmPasswordLabel": "Confirm new password",
+  "passwordPolicyHint": "Choose a strong password that you do not use anywhere else.",
+  "errCurrentPasswordWrong": "Current password is incorrect.",
+  "errPasswordMismatch": "The passwords do not match.",
+  "errWeakPassword": "Choose a stronger password.",
+  "savePassword": "Change password",
+  "passwordChanged": "Password changed. Other devices were signed out.",
+  "roleOwner": "Owner",
+  "roleManager": "Manager",
+  "roleSpecialist": "Specialist"
+}

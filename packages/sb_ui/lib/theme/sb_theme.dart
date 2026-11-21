@@ -41,6 +41,8 @@ abstract final class SbColors {
   static const inputBorder = Color(0xFFDDCBBD);
   static const darkLine = Color(0xFF4A443F);
   static const glowAmber = Color(0xFFFBE3CC);
+  static const glowAmberSoft = Color(0x99FBE3CC); // glowAmber at 60 %
+  static const dangerBorder = Color(0x40B42318); // danger at 25 %
   // Status
   static const success = Color(0xFF166534);
   static const successBg = Color(0xFFDCFCE7);
@@ -131,7 +133,7 @@ class SbTokens extends ThemeExtension<SbTokens> {
   static const screenPadding = 20.0;
   static const sectionTop = 26.0;
   static const sectionBottom = 10.0;
-  static const gap4 = 4.0, gap8 = 8.0, gap12 = 12.0, gap16 = 16.0, gap20 = 20.0, gap24 = 24.0;
+  static const gap4 = 4.0, gap8 = 8.0, gap12 = 12.0, gap16 = 16.0, gap20 = 20.0, gap24 = 24.0, gap32 = 32.0;
 
   // Sizes
   static const buttonHeight = 52.0;
@@ -145,6 +147,26 @@ class SbTokens extends ThemeExtension<SbTokens> {
   static const actionBarHeight = 92.0;
   static const featuredCardHeight = 380.0;
   static const portraitHeaderHeight = 360.0;
+  static const authCardMaxWidth = 440.0;
+  static const wideBreakpoint = 900.0;
+  static const iconSmall = 20.0;
+  static const otpBoxWidth = 46.0;
+  static const strokeThin = 2.0;
+  static const strokeHairline = 1.0;
+  static const strokeFocus = 1.5;
+
+  // Font weights and states shared by widgets (never write FontWeight / opacity literals in widgets)
+  static const weightMedium = FontWeight.w500;
+  static const weightSemibold = FontWeight.w600;
+  static const weightBold = FontWeight.w700;
+  static const disabledOpacity = 0.4;
+
+  /// Cream page with an amber glow (auth screens).
+  static const authGlow = RadialGradient(
+    center: Alignment(0.8, -0.8),
+    radius: 1.2,
+    colors: [SbColors.glowAmberSoft, SbColors.canvas],
+  );
 
   static const _cat = {
     SbCategory.haircut: (Color(0xFFFBE6D6), Color(0xFFF6CDAE), Color(0xFF9A4413)),
@@ -343,40 +365,57 @@ abstract final class SbTheme {
 
 /// Primary action: black pill. Set [onDark] on dark or photo surfaces (white pill, black text).
 class SbPrimaryButton extends StatelessWidget {
-  const SbPrimaryButton({super.key, required this.label, required this.onPressed, this.onDark = false, this.expand = true});
+  const SbPrimaryButton({
+    super.key,
+    required this.label,
+    required this.onPressed,
+    this.onDark = false,
+    this.expand = true,
+    this.loading = false,
+  });
   final String label;
   final VoidCallback? onPressed;
   final bool onDark;
   final bool expand;
 
+  /// Shows a progress indicator instead of the label and disables the button.
+  final bool loading;
+
   @override
   Widget build(BuildContext context) {
-    final enabled = onPressed != null;
+    final enabled = onPressed != null && !loading;
     final bg = onDark ? Colors.white : SbColors.ink;
     final fg = onDark ? SbColors.ink : Colors.white;
     return Semantics(
       button: true,
       enabled: enabled,
+      label: label,
+      excludeSemantics: true,
       child: Opacity(
-        opacity: enabled ? 1 : 0.4,
+        opacity: enabled || loading ? 1 : SbTokens.disabledOpacity,
         child: Material(
           color: bg,
           shape: const StadiumBorder(),
           elevation: 0,
           shadowColor: Colors.transparent,
           child: InkWell(
-            onTap: onPressed,
+            onTap: enabled ? onPressed : null,
             customBorder: const StadiumBorder(),
             child: Container(
               width: expand ? double.infinity : null,
               constraints: const BoxConstraints(minHeight: SbTokens.buttonHeight),
-              padding: const EdgeInsets.symmetric(horizontal: 24),
+              padding: const EdgeInsets.symmetric(horizontal: SbTokens.gap24),
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(SbTokens.rButton),
                 boxShadow: enabled && !onDark ? SbTokens.shadowPrimary : null,
               ),
               alignment: Alignment.center,
-              child: Text(label, textAlign: TextAlign.center, style: context.text.labelLarge!.copyWith(color: fg)),
+              child: loading
+                  ? SizedBox.square(
+                      dimension: SbTokens.iconSmall,
+                      child: CircularProgressIndicator(strokeWidth: SbTokens.strokeThin, color: fg),
+                    )
+                  : Text(label, textAlign: TextAlign.center, style: context.text.labelLarge!.copyWith(color: fg)),
             ),
           ),
         ),

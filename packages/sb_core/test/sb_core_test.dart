@@ -1,0 +1,107 @@
+import 'package:flutter_test/flutter_test.dart';
+import 'package:sb_core/sb_core.dart';
+import 'package:timezone/data/latest_10y.dart' as tz_data;
+
+void main() {
+  setUpAll(() {
+    tz_data.initializeTimeZones();
+  });
+
+  group('SbFormat', () {
+    test('money formats cents with no decimals when whole amount', () {
+      expect(SbFormat.money(150000), equals('LKR 1,500'));
+      expect(SbFormat.money(0), equals('LKR 0'));
+      expect(SbFormat.money(200000), equals('LKR 2,000'));
+      expect(SbFormat.money(150050), equals('LKR 1,500.50'));
+    });
+
+    test('dateTime formats UTC in target timezone correctly', () {
+      // 2026-10-29 04:00:00 UTC is 09:30 AM in Asia/Colombo (+05:30)
+      final utc = DateTime.utc(2026, 10, 29, 4, 0);
+      expect(SbFormat.dateTime(utc, timeZone: 'Asia/Colombo'), equals('Thu 29 Oct, 9:30 AM'));
+      expect(SbFormat.time(utc, timeZone: 'Asia/Colombo'), equals('9:30 AM'));
+      expect(SbFormat.dayLabel(utc, timeZone: 'Asia/Colombo'), equals('Thu 29 Oct'));
+    });
+  });
+
+  group('Role', () {
+    test('parse parses valid roles case-insensitively', () {
+      expect(Role.parse('owner'), equals(Role.owner));
+      expect(Role.parse('Owner'), equals(Role.owner));
+      expect(Role.parse('MANAGER'), equals(Role.manager));
+      expect(Role.parse('specialist'), equals(Role.specialist));
+    });
+
+    test('parse returns null for unknown roles', () {
+      expect(Role.parse('client'), isNull);
+      expect(Role.parse('admin'), isNull);
+      expect(Role.parse(null), isNull);
+    });
+  });
+
+  group('SessionUser', () {
+    test('serializes to and from json', () {
+      const user = SessionUser(
+        id: 'u-1',
+        fullName: 'Kasun Perera',
+        role: Role.owner,
+        salonId: 's-1',
+        salonName: 'Elegance Salon',
+        timeZone: 'Asia/Colombo',
+        staffId: 'st-1',
+      );
+
+      final json = user.toJson();
+      final restored = SessionUser.fromJson(json);
+
+      expect(restored.id, equals('u-1'));
+      expect(restored.fullName, equals('Kasun Perera'));
+      expect(restored.role, equals(Role.owner));
+      expect(restored.salonId, equals('s-1'));
+      expect(restored.salonName, equals('Elegance Salon'));
+      expect(restored.timeZone, equals('Asia/Colombo'));
+      expect(restored.staffId, equals('st-1'));
+    });
+
+    test('defaults the time zone to Asia/Colombo', () {
+      expect(SessionUser.defaultTimeZone, equals('Asia/Colombo'));
+    });
+  });
+
+  group('TokenStorage (InMemory)', () {
+    test('saves, retrieves, and clears tokens', () async {
+      final storage = InMemoryTokenStorage();
+      expect(await storage.getAccessToken(), isNull);
+      expect(await storage.getRefreshToken(), isNull);
+
+      await storage.saveTokens(accessToken: 'access-123', refreshToken: 'refresh-456');
+      expect(await storage.getAccessToken(), equals('access-123'));
+      expect(await storage.getRefreshToken(), equals('refresh-456'));
+
+      await storage.clearTokens();
+      expect(await storage.getAccessToken(), isNull);
+      expect(await storage.getRefreshToken(), isNull);
+    });
+
+    test('saves, retrieves, and clears cached user', () async {
+      final storage = InMemoryTokenStorage();
+      expect(await storage.getCachedUser(), isNull);
+
+      await storage.saveCachedUser('{"id":"u1"}');
+      expect(await storage.getCachedUser(), equals('{"id":"u1"}'));
+
+      await storage.clearCachedUser();
+      expect(await storage.getCachedUser(), isNull);
+    });
+  });
+
+  group('SbFormat.countdown', () {
+    test('formats seconds as m:ss', () {
+      expect(SbFormat.countdown(0), '0:00');
+      expect(SbFormat.countdown(7), '0:07');
+      expect(SbFormat.countdown(60), '1:00');
+      expect(SbFormat.countdown(125), '2:05');
+      expect(SbFormat.countdown(-3), '0:00');
+    });
+  });
+}
