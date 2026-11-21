@@ -17,7 +17,7 @@ class AuthHeader extends StatelessWidget {
           header: true,
           child: Text(
             title,
-            style: context.text.headlineMedium!.copyWith(color: SbColors.ink, fontWeight: FontWeight.w700),
+            style: context.text.headlineMedium!.copyWith(color: SbColors.ink, fontWeight: SbTokens.weightBold),
           ),
         ),
         const SizedBox(height: SbTokens.gap8),

@@ -17,15 +17,7 @@ class SbAuthScaffold extends StatelessWidget {
       body: Stack(
         children: [
           Positioned.fill(
-            child: DecoratedBox(
-              decoration: BoxDecoration(
-                gradient: RadialGradient(
-                  center: const Alignment(0.8, -0.8),
-                  radius: 1.2,
-                  colors: [SbColors.glowAmber.withValues(alpha: 0.6), SbColors.canvas],
-                ),
-              ),
-            ),
+            child: DecoratedBox(decoration: BoxDecoration(gradient: SbTokens.authGlow)),
           ),
           SafeArea(
             child: LayoutBuilder(

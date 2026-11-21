@@ -54,7 +54,7 @@ class SbTextField extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    OutlineInputBorder border(Color color, [double width = 1]) => OutlineInputBorder(
+    OutlineInputBorder border(Color color, [double width = SbTokens.strokeHairline]) => OutlineInputBorder(
       borderRadius: BorderRadius.circular(SbTokens.rInput),
       borderSide: BorderSide(color: color, width: width),
     );
@@ -66,7 +66,7 @@ class SbTextField extends StatelessWidget {
         if (label != null) ...[
           Text(
             label!,
-            style: context.text.labelMedium!.copyWith(color: SbColors.text2, fontWeight: FontWeight.w600),
+            style: context.text.labelMedium!.copyWith(color: SbColors.text2, fontWeight: SbTokens.weightSemibold),
           ),
           const SizedBox(height: SbTokens.gap8),
         ],
@@ -87,12 +87,12 @@ class SbTextField extends StatelessWidget {
           enableSuggestions: enableSuggestions,
           onChanged: onChanged,
           onFieldSubmitted: onFieldSubmitted,
-          style: context.text.bodyLarge!.copyWith(color: SbColors.text, fontWeight: FontWeight.w500),
+          style: context.text.bodyLarge!.copyWith(color: SbColors.text, fontWeight: SbTokens.weightMedium),
           decoration: InputDecoration(
             hintText: hint,
             hintStyle: context.text.bodyLarge!.copyWith(color: SbColors.subtle),
             prefixText: prefixText,
-            prefixStyle: context.text.bodyLarge!.copyWith(color: SbColors.text, fontWeight: FontWeight.w600),
+            prefixStyle: context.text.bodyLarge!.copyWith(color: SbColors.text, fontWeight: SbTokens.weightSemibold),
             prefixIcon: prefix,
             suffixIcon: suffix,
             counterText: '',
@@ -102,9 +102,9 @@ class SbTextField extends StatelessWidget {
             contentPadding: const EdgeInsets.symmetric(horizontal: SbTokens.gap16, vertical: SbTokens.gap12),
             border: border(SbColors.inputBorder),
             enabledBorder: border(SbColors.inputBorder),
-            focusedBorder: border(SbColors.amber, 1.5),
+            focusedBorder: border(SbColors.amber, SbTokens.strokeFocus),
             errorBorder: border(SbColors.danger),
-            focusedErrorBorder: border(SbColors.danger, 1.5),
+            focusedErrorBorder: border(SbColors.danger, SbTokens.strokeFocus),
             errorText: errorText,
             errorStyle: context.text.bodySmall!.copyWith(color: SbColors.danger),
           ),

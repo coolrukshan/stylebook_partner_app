@@ -129,7 +129,7 @@ class _SbOtpInputState extends State<SbOtpInput> {
                 color: widget.hasError
                     ? SbColors.danger
                     : (_focusNodes[index].hasFocus ? SbColors.amber : SbColors.inputBorder),
-                width: _focusNodes[index].hasFocus || widget.hasError ? 1.5 : 1,
+                width: _focusNodes[index].hasFocus || widget.hasError ? SbTokens.strokeFocus : SbTokens.strokeHairline,
               ),
             ),
             child: TextField(
@@ -144,7 +144,7 @@ class _SbOtpInputState extends State<SbOtpInput> {
               minLines: null,
               autofillHints: const [AutofillHints.oneTimeCode],
               style: context.text.headlineSmall!.copyWith(
-                fontWeight: FontWeight.w700,
+                fontWeight: SbTokens.weightBold,
                 color: widget.hasError ? SbColors.danger : SbColors.text,
               ),
               inputFormatters: [FilteringTextInputFormatter.digitsOnly],

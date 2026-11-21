@@ -24,7 +24,7 @@ class SbTextLink extends StatelessWidget {
         ),
         child: Text(
           text,
-          style: context.text.labelMedium!.copyWith(color: fg, fontWeight: FontWeight.w600),
+          style: context.text.labelMedium!.copyWith(color: fg, fontWeight: SbTokens.weightSemibold),
         ),
       ),
     );

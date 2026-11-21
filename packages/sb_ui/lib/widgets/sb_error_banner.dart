@@ -1,14 +1,11 @@
 import 'package:flutter/material.dart';
+
 import '../theme/sb_theme.dart';
 
 /// Error banner using design system danger tokens. Announced as a live region.
 class SbErrorBanner extends StatelessWidget {
-  const SbErrorBanner({
-    super.key,
-    required this.message,
-    this.retryLabel,
-    this.onRetry,
-  }) : assert(onRetry == null || retryLabel != null, 'retryLabel (localised) is required with onRetry');
+  const SbErrorBanner({super.key, required this.message, this.retryLabel, this.onRetry})
+    : assert(onRetry == null || retryLabel != null, 'retryLabel (localised) is required with onRetry');
 
   final String message;
   final String? retryLabel;
@@ -25,26 +22,19 @@ class SbErrorBanner extends StatelessWidget {
         decoration: BoxDecoration(
           color: SbColors.dangerBg,
           borderRadius: BorderRadius.circular(SbTokens.rInput),
-          border: Border.all(color: SbColors.danger.withValues(alpha: 0.25)),
+          border: Border.all(color: SbColors.dangerBorder),
         ),
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
             const ExcludeSemantics(
-              child: Icon(
-                Icons.error_outline,
-                color: SbColors.danger,
-                size: SbTokens.iconSmall,
-              ),
+              child: Icon(Icons.error_outline, color: SbColors.danger, size: SbTokens.iconSmall),
             ),
             const SizedBox(width: SbTokens.gap12),
             Expanded(
               child: Text(
                 message,
-                style: context.text.bodyMedium!.copyWith(
-                  color: SbColors.danger,
-                  fontWeight: FontWeight.w500,
-                ),
+                style: context.text.bodyMedium!.copyWith(color: SbColors.danger, fontWeight: SbTokens.weightMedium),
               ),
             ),
             if (onRetry != null) ...[
@@ -60,7 +50,7 @@ class SbErrorBanner extends StatelessWidget {
                   retryLabel!,
                   style: context.text.labelMedium!.copyWith(
                     color: SbColors.danger,
-                    fontWeight: FontWeight.w700,
+                    fontWeight: SbTokens.weightBold,
                     decoration: TextDecoration.underline,
                   ),
                 ),

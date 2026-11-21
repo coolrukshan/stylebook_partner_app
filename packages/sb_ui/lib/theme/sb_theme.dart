@@ -41,6 +41,8 @@ abstract final class SbColors {
   static const inputBorder = Color(0xFFDDCBBD);
   static const darkLine = Color(0xFF4A443F);
   static const glowAmber = Color(0xFFFBE3CC);
+  static const glowAmberSoft = Color(0x99FBE3CC); // glowAmber at 60 %
+  static const dangerBorder = Color(0x40B42318); // danger at 25 %
   // Status
   static const success = Color(0xFF166534);
   static const successBg = Color(0xFFDCFCE7);
@@ -150,6 +152,21 @@ class SbTokens extends ThemeExtension<SbTokens> {
   static const iconSmall = 20.0;
   static const otpBoxWidth = 46.0;
   static const strokeThin = 2.0;
+  static const strokeHairline = 1.0;
+  static const strokeFocus = 1.5;
+
+  // Font weights and states shared by widgets (never write FontWeight / opacity literals in widgets)
+  static const weightMedium = FontWeight.w500;
+  static const weightSemibold = FontWeight.w600;
+  static const weightBold = FontWeight.w700;
+  static const disabledOpacity = 0.4;
+
+  /// Cream page with an amber glow (auth screens).
+  static const authGlow = RadialGradient(
+    center: Alignment(0.8, -0.8),
+    radius: 1.2,
+    colors: [SbColors.glowAmberSoft, SbColors.canvas],
+  );
 
   static const _cat = {
     SbCategory.haircut: (Color(0xFFFBE6D6), Color(0xFFF6CDAE), Color(0xFF9A4413)),
@@ -375,7 +392,7 @@ class SbPrimaryButton extends StatelessWidget {
       label: label,
       excludeSemantics: true,
       child: Opacity(
-        opacity: enabled || loading ? 1 : 0.4,
+        opacity: enabled || loading ? 1 : SbTokens.disabledOpacity,
         child: Material(
           color: bg,
           shape: const StadiumBorder(),
