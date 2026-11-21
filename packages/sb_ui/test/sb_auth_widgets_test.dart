@@ -2,7 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:sb_ui/sb_ui.dart';
 
-Widget _app(Widget child) => MaterialApp(theme: SbTheme.light(), home: Scaffold(body: Center(child: child)));
+Widget _app(Widget child) => MaterialApp(
+  theme: SbTheme.light(),
+  home: Scaffold(body: Center(child: child)),
+);
 
 void main() {
   testWidgets('SbTextLink is at least 44 x 44 even for a short label', (tester) async {
@@ -31,10 +34,7 @@ void main() {
   testWidgets('SbErrorBanner is a live region and its retry target is 44 px', (tester) async {
     final handle = tester.ensureSemantics();
     await tester.pumpWidget(_app(SbErrorBanner(message: 'Offline', retryLabel: 'Retry', onRetry: () {})));
-    expect(
-      tester.getSemantics(find.text('Offline')),
-      matchesSemantics(label: 'Offline', isLiveRegion: true),
-    );
+    expect(tester.getSemantics(find.text('Offline')), matchesSemantics(label: 'Offline', isLiveRegion: true));
     expect(tester.getSize(find.byType(TextButton)).height, greaterThanOrEqualTo(SbTokens.minTouch));
     handle.dispose();
   });
@@ -59,10 +59,7 @@ void main() {
 
   testWidgets('SbOtpInput uses the supplied semantics label builder and honours enabled', (tester) async {
     final handle = tester.ensureSemantics();
-    await tester.pumpWidget(_app(SbOtpInput(
-      enabled: false,
-      semanticLabelBuilder: (i, n) => 'Cijfer $i van $n',
-    )));
+    await tester.pumpWidget(_app(SbOtpInput(enabled: false, semanticLabelBuilder: (i, n) => 'Cijfer $i van $n')));
     expect(find.bySemanticsLabel('Cijfer 1 van 6'), findsOneWidget);
     expect(tester.widget<TextField>(find.byType(TextField).first).enabled, isFalse);
     handle.dispose();
@@ -76,14 +73,18 @@ void main() {
   });
 
   testWidgets('SbTextField forwards obscure, autofill and input action', (tester) async {
-    await tester.pumpWidget(_app(const SbTextField(
-      label: 'Username',
-      autocorrect: false,
-      enableSuggestions: false,
-      maxLength: 50,
-      autofillHints: [AutofillHints.username],
-      textInputAction: TextInputAction.next,
-    )));
+    await tester.pumpWidget(
+      _app(
+        const SbTextField(
+          label: 'Username',
+          autocorrect: false,
+          enableSuggestions: false,
+          maxLength: 50,
+          autofillHints: [AutofillHints.username],
+          textInputAction: TextInputAction.next,
+        ),
+      ),
+    );
     final editable = tester.widget<EditableText>(find.byType(EditableText));
     expect(editable.autocorrect, isFalse);
     expect(editable.autofillHints, contains(AutofillHints.username));

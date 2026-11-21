@@ -2,7 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:sb_ui/sb_ui.dart';
 
-Widget _app(Widget child) => MaterialApp(theme: SbTheme.light(), home: Scaffold(body: child));
+Widget _app(Widget child) => MaterialApp(
+  theme: SbTheme.light(),
+  home: Scaffold(body: child),
+);
 
 void main() {
   const field = SbPasswordField(label: 'Password', showLabel: 'Show password', hideLabel: 'Hide password');
@@ -46,13 +49,17 @@ void main() {
   });
 
   testWidgets('disables autocorrect and suggestions and forwards autofill hints', (tester) async {
-    await tester.pumpWidget(_app(const SbPasswordField(
-      label: 'Password',
-      showLabel: 's',
-      hideLabel: 'h',
-      autofillHints: [AutofillHints.password],
-      maxLength: 128,
-    )));
+    await tester.pumpWidget(
+      _app(
+        const SbPasswordField(
+          label: 'Password',
+          showLabel: 's',
+          hideLabel: 'h',
+          autofillHints: [AutofillHints.password],
+          maxLength: 128,
+        ),
+      ),
+    );
     final editable = tester.widget<EditableText>(find.byType(EditableText));
     expect(editable.autocorrect, isFalse);
     expect(editable.enableSuggestions, isFalse);

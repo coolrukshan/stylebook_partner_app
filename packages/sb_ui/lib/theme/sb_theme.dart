@@ -146,6 +146,7 @@ class SbTokens extends ThemeExtension<SbTokens> {
   static const featuredCardHeight = 380.0;
   static const portraitHeaderHeight = 360.0;
   static const authCardMaxWidth = 440.0;
+  static const wideBreakpoint = 900.0;
   static const iconSmall = 20.0;
   static const otpBoxWidth = 46.0;
   static const strokeThin = 2.0;

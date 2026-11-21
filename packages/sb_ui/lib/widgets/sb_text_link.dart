@@ -1,14 +1,10 @@
 import 'package:flutter/material.dart';
+
 import '../theme/sb_theme.dart';
 
 /// Amber text link button with minimum 44px touch target.
 class SbTextLink extends StatelessWidget {
-  const SbTextLink({
-    super.key,
-    required this.text,
-    required this.onTap,
-    this.enabled = true,
-  });
+  const SbTextLink({super.key, required this.text, required this.onTap, this.enabled = true});
 
   final String text;
   final VoidCallback onTap;
@@ -28,10 +24,7 @@ class SbTextLink extends StatelessWidget {
         ),
         child: Text(
           text,
-          style: context.text.labelMedium!.copyWith(
-            color: fg,
-            fontWeight: FontWeight.w600,
-          ),
+          style: context.text.labelMedium!.copyWith(color: fg, fontWeight: FontWeight.w600),
         ),
       ),
     );

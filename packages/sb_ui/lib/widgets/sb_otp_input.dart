@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+
 import '../theme/sb_theme.dart';
 
 /// 6-digit OTP input row with per-digit focus handling and paste support.
@@ -53,8 +54,13 @@ class _SbOtpInputState extends State<SbOtpInput> {
       for (final c in _controllers) {
         c.clear();
       }
-      _focusNodes.first.requestFocus();
-      widget.onChanged?.call('');
+      // After the frame: the boxes may only just have been re-enabled (after a failed verify), and
+      // the parent must not be told to rebuild while it is building.
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (!mounted) return;
+        _focusNodes.first.requestFocus();
+        widget.onChanged?.call('');
+      });
     }
   }
 
@@ -110,8 +116,8 @@ class _SbOtpInputState extends State<SbOtpInput> {
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: List.generate(widget.length, (index) {
         return Semantics(
-          label: widget.semanticLabelBuilder?.call(index + 1, widget.length) ??
-              'Digit ${index + 1} of ${widget.length}',
+          label:
+              widget.semanticLabelBuilder?.call(index + 1, widget.length) ?? 'Digit ${index + 1} of ${widget.length}',
           child: Container(
             width: SbTokens.otpBoxWidth,
             height: SbTokens.buttonHeight,
@@ -141,9 +147,7 @@ class _SbOtpInputState extends State<SbOtpInput> {
                 fontWeight: FontWeight.w700,
                 color: widget.hasError ? SbColors.danger : SbColors.text,
               ),
-              inputFormatters: [
-                FilteringTextInputFormatter.digitsOnly,
-              ],
+              inputFormatters: [FilteringTextInputFormatter.digitsOnly],
               decoration: const InputDecoration(
                 border: InputBorder.none,
                 contentPadding: EdgeInsets.zero,

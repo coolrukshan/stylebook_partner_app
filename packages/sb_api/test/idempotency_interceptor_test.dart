@@ -17,7 +17,9 @@ void main() {
       return ResponseBody.fromString(
         '{"ok":true}',
         200,
-        headers: {Headers.contentTypeHeader: [Headers.jsonContentType]},
+        headers: {
+          Headers.contentTypeHeader: [Headers.jsonContentType],
+        },
       );
     });
 
@@ -33,7 +35,9 @@ void main() {
       return ResponseBody.fromString(
         '{"ok":true}',
         200,
-        headers: {Headers.contentTypeHeader: [Headers.jsonContentType]},
+        headers: {
+          Headers.contentTypeHeader: [Headers.jsonContentType],
+        },
       );
     });
 
@@ -51,12 +55,35 @@ void main() {
       return ResponseBody.fromString(
         '{"ok":true}',
         200,
-        headers: {Headers.contentTypeHeader: [Headers.jsonContentType]},
+        headers: {
+          Headers.contentTypeHeader: [Headers.jsonContentType],
+        },
       );
     });
 
     await dio.get<Map<String, dynamic>>('/v1/partner/bookings');
     expect(capturedKey, isNull);
+  });
+
+  test('does not add Idempotency-Key to partner auth endpoints', () async {
+    final seen = <String, Object?>{};
+    dio.httpClientAdapter = _MockHttpAdapter((options) async {
+      seen[options.path] = options.headers['Idempotency-Key'];
+      return ResponseBody.fromString(
+        '{"ok":true}',
+        200,
+        headers: {
+          Headers.contentTypeHeader: [Headers.jsonContentType],
+        },
+      );
+    });
+
+    await dio.post<dynamic>('/v1/partner/auth/login', data: {'username': 'a', 'password': 'b'});
+    await dio.post<dynamic>('/v1/partner/auth/otp/send');
+    await dio.post<dynamic>('/v1/partner/auth/otp/verify', data: {'otp': '123456'});
+    await dio.post<dynamic>('/v1/partner/auth/password/change', data: {});
+    expect(seen.values, everyElement(isNull));
+    expect(seen.length, 4);
   });
 }
 

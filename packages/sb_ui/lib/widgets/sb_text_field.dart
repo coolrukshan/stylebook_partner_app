@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+
 import '../theme/sb_theme.dart';
 
 /// StyleBook styled text input.
@@ -54,9 +55,9 @@ class SbTextField extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     OutlineInputBorder border(Color color, [double width = 1]) => OutlineInputBorder(
-          borderRadius: BorderRadius.circular(SbTokens.rInput),
-          borderSide: BorderSide(color: color, width: width),
-        );
+      borderRadius: BorderRadius.circular(SbTokens.rInput),
+      borderSide: BorderSide(color: color, width: width),
+    );
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -65,10 +66,7 @@ class SbTextField extends StatelessWidget {
         if (label != null) ...[
           Text(
             label!,
-            style: context.text.labelMedium!.copyWith(
-              color: SbColors.text2,
-              fontWeight: FontWeight.w600,
-            ),
+            style: context.text.labelMedium!.copyWith(color: SbColors.text2, fontWeight: FontWeight.w600),
           ),
           const SizedBox(height: SbTokens.gap8),
         ],
@@ -89,18 +87,12 @@ class SbTextField extends StatelessWidget {
           enableSuggestions: enableSuggestions,
           onChanged: onChanged,
           onFieldSubmitted: onFieldSubmitted,
-          style: context.text.bodyLarge!.copyWith(
-            color: SbColors.text,
-            fontWeight: FontWeight.w500,
-          ),
+          style: context.text.bodyLarge!.copyWith(color: SbColors.text, fontWeight: FontWeight.w500),
           decoration: InputDecoration(
             hintText: hint,
             hintStyle: context.text.bodyLarge!.copyWith(color: SbColors.subtle),
             prefixText: prefixText,
-            prefixStyle: context.text.bodyLarge!.copyWith(
-              color: SbColors.text,
-              fontWeight: FontWeight.w600,
-            ),
+            prefixStyle: context.text.bodyLarge!.copyWith(color: SbColors.text, fontWeight: FontWeight.w600),
             prefixIcon: prefix,
             suffixIcon: suffix,
             counterText: '',
