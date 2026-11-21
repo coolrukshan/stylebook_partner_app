@@ -139,6 +139,7 @@ class SessionController extends AsyncNotifier<AuthState> {
     final session = state.value;
     if (session is! SignedIn) return;
     await _set(Full(partnerUser: session.partnerUser, mustChangePassword: response.mustChangePassword));
+    ref.read(passwordChangedSignalProvider.notifier).notify();
   }
 
   /// The server answered 403 OTP_REQUIRED: the stored tier was too optimistic.

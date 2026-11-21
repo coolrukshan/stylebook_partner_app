@@ -34,8 +34,6 @@ class _ChangePasswordScreenState extends ConsumerState<ChangePasswordScreen> {
 
   Future<void> _submit() async {
     final router = GoRouter.of(context);
-    final messenger = ScaffoldMessenger.of(context);
-    final l10n = AppLocalizations.of(context);
     final from = safeFromTarget(GoRouterState.of(context).uri.queryParameters['from']);
 
     final changed = await ref
@@ -43,7 +41,7 @@ class _ChangePasswordScreenState extends ConsumerState<ChangePasswordScreen> {
         .submit(current: _current.text, next: _new.text, confirm: _confirm.text);
     if (!changed || !mounted) return;
 
-    messenger.showSnackBar(SnackBar(content: Text(l10n.passwordChanged)));
+    // The "Password changed" snackbar comes from SessionNotices (it survives a step-up).
     router.go(from ?? kHomePath);
   }
 

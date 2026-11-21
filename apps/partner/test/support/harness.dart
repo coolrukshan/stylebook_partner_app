@@ -9,6 +9,7 @@ import 'package:sb_core/sb_core.dart';
 import 'package:sb_ui/sb_ui.dart';
 import 'package:stylebook_partner/features/auth/application/providers.dart';
 import 'package:stylebook_partner/features/auth/data/models/partner_user_out.dart';
+import 'package:stylebook_partner/features/auth/presentation/widgets/session_notices.dart';
 import 'package:stylebook_partner/l10n/app_localizations.dart';
 
 import 'fakes.dart';
@@ -73,9 +74,11 @@ class ScreenHarness {
             // The real app's router watches the session, so it is always built.
             builder: (context, ref, _) {
               ref.watch(sessionControllerProvider);
-              return MediaQuery(
-                data: MediaQuery.of(context).copyWith(textScaler: TextScaler.linear(textScale)),
-                child: child!,
+              return SessionNotices(
+                child: MediaQuery(
+                  data: MediaQuery.of(context).copyWith(textScaler: TextScaler.linear(textScale)),
+                  child: child!,
+                ),
               );
             },
           ),

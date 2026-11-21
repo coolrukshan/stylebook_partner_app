@@ -1,5 +1,8 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:go_router/go_router.dart';
 import 'package:sb_ui/sb_ui.dart';
 import 'package:stylebook_partner/features/auth/application/providers.dart';
 import 'package:stylebook_partner/features/auth/application/session_controller.dart';
@@ -106,6 +109,29 @@ void main() {
     expect(find.text('Password changed. Other devices were signed out.'), findsOneWidget);
     expect(find.text('HOME'), findsOneWidget);
     expect((h.container(tester, Scaffold).read(sessionControllerProvider).value as Full).mustChangePassword, isFalse);
+  });
+
+  testWidgets('step-up interrupts the change: the retried call keeps the typed values and the snackbar still shows', (
+    tester,
+  ) async {
+    final parked = Completer<void>();
+    h.repo.changeGate = parked.future;
+    await h.pump(tester, const ChangePasswordScreen());
+    await fill(tester);
+    await tester.tap(button());
+    await tester.pump();
+
+    // The router replaces this screen with Verify code while the call is parked.
+    GoRouter.of(tester.element(find.byType(ChangePasswordScreen))).go('/');
+    await tester.pumpAndSettle();
+    expect(find.byType(ChangePasswordScreen), findsNothing);
+
+    // Step-up succeeds, the parked request is retried and completes.
+    parked.complete();
+    await tester.pumpAndSettle();
+
+    expect(h.repo.changeCalls.single, (current: 'Temp#1', next: 'My-New-Passw0rd'));
+    expect(find.text('Password changed. Other devices were signed out.'), findsOneWidget);
   });
 
   testWidgets('banners: rate limit, offline and a cancelled step-up', (tester) async {

@@ -48,6 +48,7 @@ class FakeAuthRepository implements AuthRepository {
   Object? verifyError;
   PartnerFullSessionResponse? changeResult;
   Object? changeError;
+  Future<void>? changeGate;
   Object? refreshError;
   Future<void>? refreshGate;
 
@@ -90,6 +91,7 @@ class FakeAuthRepository implements AuthRepository {
   @override
   Future<PartnerFullSessionResponse> changePassword({required String current, required String next}) async {
     changeCalls.add((current: current, next: next));
+    if (changeGate != null) await changeGate;
     if (changeError != null) throw changeError!;
     final r = changeResult ?? fullResponse(access: 'changed-acc', refresh: 'changed-ref');
     await tokenStorage.saveTokens(accessToken: r.accessToken, refreshToken: r.refreshToken);

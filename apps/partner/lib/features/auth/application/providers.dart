@@ -19,6 +19,17 @@ class SessionEpochNotifier extends Notifier<int> {
 
 final sessionEpochProvider = NotifierProvider<SessionEpochNotifier, int>(SessionEpochNotifier.new);
 
+/// Counter bumped when a password change completed. An app-level listener shows the notice,
+/// so it survives the change-password screen being replaced by a step-up mid-request.
+class PasswordChangedSignal extends Notifier<int> {
+  @override
+  int build() => 0;
+
+  void notify() => state++;
+}
+
+final passwordChangedSignalProvider = NotifierProvider<PasswordChangedSignal, int>(PasswordChangedSignal.new);
+
 /// Secure token storage provider.
 final tokenStorageProvider = Provider<TokenStorage>((ref) => const SecureTokenStorage());
 
