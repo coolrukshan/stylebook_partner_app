@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import '../theme/sb_theme.dart';
 
 /// StyleBook styled text input.
@@ -6,12 +7,22 @@ class SbTextField extends StatelessWidget {
   const SbTextField({
     super.key,
     this.controller,
+    this.focusNode,
     this.label,
     this.hint,
     this.prefixText,
     this.prefix,
+    this.suffix,
     this.errorText,
     this.keyboardType,
+    this.textInputAction,
+    this.textCapitalization = TextCapitalization.none,
+    this.autofillHints,
+    this.inputFormatters,
+    this.maxLength,
+    this.obscureText = false,
+    this.autocorrect = true,
+    this.enableSuggestions = true,
     this.autofocus = false,
     this.enabled = true,
     this.onChanged,
@@ -19,12 +30,22 @@ class SbTextField extends StatelessWidget {
   });
 
   final TextEditingController? controller;
+  final FocusNode? focusNode;
   final String? label;
   final String? hint;
   final String? prefixText;
   final Widget? prefix;
+  final Widget? suffix;
   final String? errorText;
   final TextInputType? keyboardType;
+  final TextInputAction? textInputAction;
+  final TextCapitalization textCapitalization;
+  final Iterable<String>? autofillHints;
+  final List<TextInputFormatter>? inputFormatters;
+  final int? maxLength;
+  final bool obscureText;
+  final bool autocorrect;
+  final bool enableSuggestions;
   final bool autofocus;
   final bool enabled;
   final ValueChanged<String>? onChanged;
@@ -32,6 +53,11 @@ class SbTextField extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    OutlineInputBorder border(Color color, [double width = 1]) => OutlineInputBorder(
+          borderRadius: BorderRadius.circular(SbTokens.rInput),
+          borderSide: BorderSide(color: color, width: width),
+        );
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       mainAxisSize: MainAxisSize.min,
@@ -44,13 +70,23 @@ class SbTextField extends StatelessWidget {
               fontWeight: FontWeight.w600,
             ),
           ),
-          const SizedBox(height: 6),
+          const SizedBox(height: SbTokens.gap8),
         ],
         TextFormField(
           controller: controller,
+          focusNode: focusNode,
           enabled: enabled,
           autofocus: autofocus,
           keyboardType: keyboardType,
+          textInputAction: textInputAction,
+          textCapitalization: textCapitalization,
+          autofillHints: autofillHints,
+          inputFormatters: inputFormatters,
+          maxLength: maxLength,
+          maxLengthEnforcement: MaxLengthEnforcement.enforced,
+          obscureText: obscureText,
+          autocorrect: autocorrect,
+          enableSuggestions: enableSuggestions,
           onChanged: onChanged,
           onFieldSubmitted: onFieldSubmitted,
           style: context.text.bodyLarge!.copyWith(
@@ -66,29 +102,17 @@ class SbTextField extends StatelessWidget {
               fontWeight: FontWeight.w600,
             ),
             prefixIcon: prefix,
+            suffixIcon: suffix,
+            counterText: '',
             filled: true,
             fillColor: enabled ? SbColors.inputFill : SbColors.soft,
-            contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
-            border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(SbTokens.rInput),
-              borderSide: const BorderSide(color: SbColors.inputBorder),
-            ),
-            enabledBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(SbTokens.rInput),
-              borderSide: const BorderSide(color: SbColors.inputBorder),
-            ),
-            focusedBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(SbTokens.rInput),
-              borderSide: const BorderSide(color: SbColors.amber, width: 1.5),
-            ),
-            errorBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(SbTokens.rInput),
-              borderSide: const BorderSide(color: SbColors.danger),
-            ),
-            focusedErrorBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(SbTokens.rInput),
-              borderSide: const BorderSide(color: SbColors.danger, width: 1.5),
-            ),
+            constraints: const BoxConstraints(minHeight: SbTokens.inputHeight),
+            contentPadding: const EdgeInsets.symmetric(horizontal: SbTokens.gap16, vertical: SbTokens.gap12),
+            border: border(SbColors.inputBorder),
+            enabledBorder: border(SbColors.inputBorder),
+            focusedBorder: border(SbColors.amber, 1.5),
+            errorBorder: border(SbColors.danger),
+            focusedErrorBorder: border(SbColors.danger, 1.5),
             errorText: errorText,
             errorStyle: context.text.bodySmall!.copyWith(color: SbColors.danger),
           ),

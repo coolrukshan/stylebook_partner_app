@@ -131,7 +131,7 @@ class SbTokens extends ThemeExtension<SbTokens> {
   static const screenPadding = 20.0;
   static const sectionTop = 26.0;
   static const sectionBottom = 10.0;
-  static const gap4 = 4.0, gap8 = 8.0, gap12 = 12.0, gap16 = 16.0, gap20 = 20.0, gap24 = 24.0;
+  static const gap4 = 4.0, gap8 = 8.0, gap12 = 12.0, gap16 = 16.0, gap20 = 20.0, gap24 = 24.0, gap32 = 32.0;
 
   // Sizes
   static const buttonHeight = 52.0;
@@ -146,6 +146,9 @@ class SbTokens extends ThemeExtension<SbTokens> {
   static const featuredCardHeight = 380.0;
   static const portraitHeaderHeight = 360.0;
   static const authCardMaxWidth = 440.0;
+  static const iconSmall = 20.0;
+  static const otpBoxWidth = 46.0;
+  static const strokeThin = 2.0;
 
   static const _cat = {
     SbCategory.haircut: (Color(0xFFFBE6D6), Color(0xFFF6CDAE), Color(0xFF9A4413)),
@@ -344,40 +347,57 @@ abstract final class SbTheme {
 
 /// Primary action: black pill. Set [onDark] on dark or photo surfaces (white pill, black text).
 class SbPrimaryButton extends StatelessWidget {
-  const SbPrimaryButton({super.key, required this.label, required this.onPressed, this.onDark = false, this.expand = true});
+  const SbPrimaryButton({
+    super.key,
+    required this.label,
+    required this.onPressed,
+    this.onDark = false,
+    this.expand = true,
+    this.loading = false,
+  });
   final String label;
   final VoidCallback? onPressed;
   final bool onDark;
   final bool expand;
 
+  /// Shows a progress indicator instead of the label and disables the button.
+  final bool loading;
+
   @override
   Widget build(BuildContext context) {
-    final enabled = onPressed != null;
+    final enabled = onPressed != null && !loading;
     final bg = onDark ? Colors.white : SbColors.ink;
     final fg = onDark ? SbColors.ink : Colors.white;
     return Semantics(
       button: true,
       enabled: enabled,
+      label: label,
+      excludeSemantics: true,
       child: Opacity(
-        opacity: enabled ? 1 : 0.4,
+        opacity: enabled || loading ? 1 : 0.4,
         child: Material(
           color: bg,
           shape: const StadiumBorder(),
           elevation: 0,
           shadowColor: Colors.transparent,
           child: InkWell(
-            onTap: onPressed,
+            onTap: enabled ? onPressed : null,
             customBorder: const StadiumBorder(),
             child: Container(
               width: expand ? double.infinity : null,
               constraints: const BoxConstraints(minHeight: SbTokens.buttonHeight),
-              padding: const EdgeInsets.symmetric(horizontal: 24),
+              padding: const EdgeInsets.symmetric(horizontal: SbTokens.gap24),
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(SbTokens.rButton),
                 boxShadow: enabled && !onDark ? SbTokens.shadowPrimary : null,
               ),
               alignment: Alignment.center,
-              child: Text(label, textAlign: TextAlign.center, style: context.text.labelLarge!.copyWith(color: fg)),
+              child: loading
+                  ? SizedBox.square(
+                      dimension: SbTokens.iconSmall,
+                      child: CircularProgressIndicator(strokeWidth: SbTokens.strokeThin, color: fg),
+                    )
+                  : Text(label, textAlign: TextAlign.center, style: context.text.labelLarge!.copyWith(color: fg)),
             ),
           ),
         ),

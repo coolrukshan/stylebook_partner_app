@@ -18,11 +18,11 @@ class SbTextLink extends StatelessWidget {
   Widget build(BuildContext context) {
     final fg = enabled ? SbColors.amber : SbColors.muted;
     return ConstrainedBox(
-      constraints: const BoxConstraints(minHeight: SbTokens.minTouch),
+      constraints: const BoxConstraints(minHeight: SbTokens.minTouch, minWidth: SbTokens.minTouch),
       child: TextButton(
         onPressed: enabled ? onTap : null,
         style: TextButton.styleFrom(
-          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+          padding: const EdgeInsets.symmetric(horizontal: SbTokens.gap12, vertical: SbTokens.gap8),
           minimumSize: const Size(SbTokens.minTouch, SbTokens.minTouch),
           tapTargetSize: MaterialTapTargetSize.shrinkWrap,
         ),

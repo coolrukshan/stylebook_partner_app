@@ -8,12 +8,22 @@ class SbOtpInput extends StatefulWidget {
     super.key,
     this.length = 6,
     this.hasError = false,
+    this.enabled = true,
+    this.clearSignal = 0,
+    this.semanticLabelBuilder,
     this.onCompleted,
     this.onChanged,
   });
 
   final int length;
   final bool hasError;
+  final bool enabled;
+
+  /// Changing this value clears all boxes and refocuses the first one (for example after a wrong code).
+  final int clearSignal;
+
+  /// Localised label for box [index] (1-based) of [total]. Defaults to English.
+  final String Function(int index, int total)? semanticLabelBuilder;
   final ValueChanged<String>? onCompleted;
   final ValueChanged<String>? onChanged;
 
@@ -29,7 +39,23 @@ class _SbOtpInputState extends State<SbOtpInput> {
   void initState() {
     super.initState();
     _controllers = List.generate(widget.length, (_) => TextEditingController());
-    _focusNodes = List.generate(widget.length, (_) => FocusNode());
+    _focusNodes = List.generate(widget.length, (_) => FocusNode()..addListener(_onFocusChanged));
+  }
+
+  void _onFocusChanged() {
+    if (mounted) setState(() {});
+  }
+
+  @override
+  void didUpdateWidget(SbOtpInput oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.clearSignal != widget.clearSignal) {
+      for (final c in _controllers) {
+        c.clear();
+      }
+      _focusNodes.first.requestFocus();
+      widget.onChanged?.call('');
+    }
   }
 
   @override
@@ -84,10 +110,11 @@ class _SbOtpInputState extends State<SbOtpInput> {
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: List.generate(widget.length, (index) {
         return Semantics(
-          label: 'Digit ${index + 1} of ${widget.length}',
+          label: widget.semanticLabelBuilder?.call(index + 1, widget.length) ??
+              'Digit ${index + 1} of ${widget.length}',
           child: Container(
-            width: 46,
-            height: 52,
+            width: SbTokens.otpBoxWidth,
+            height: SbTokens.buttonHeight,
             alignment: Alignment.center,
             decoration: BoxDecoration(
               color: SbColors.inputFill,
@@ -101,9 +128,14 @@ class _SbOtpInputState extends State<SbOtpInput> {
             ),
             child: TextField(
               controller: _controllers[index],
+              enabled: widget.enabled,
               focusNode: _focusNodes[index],
               keyboardType: TextInputType.number,
               textAlign: TextAlign.center,
+              textAlignVertical: TextAlignVertical.center,
+              expands: true,
+              maxLines: null,
+              minLines: null,
               autofillHints: const [AutofillHints.oneTimeCode],
               style: context.text.headlineSmall!.copyWith(
                 fontWeight: FontWeight.w700,
