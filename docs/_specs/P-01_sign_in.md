@@ -8,7 +8,7 @@ Revision: aligned to the REAL partner credential contract. The "proposed endpoin
 Get a salon user into the app with a username and password, then let them unlock the full app with an SMS code. Same screens for all roles.
 - Accounts are created by a StyleBook admin (`POST /v1/admin/salons/{salon_id}/accounts`, `member_type` owner|staff). The temporary password is shown once to the admin and handed over out of band. No invite, no sign-up, no self-service reset.
 - Owner, Manager, Specialist: all sign in the same way. What each can do afterwards is decided by role (section 7 and Gap 6).
-- Forgot password: no endpoint. The app shows "Ask your salon owner or StyleBook support". The owner cannot reset it in the app (reset is admin-only: `POST /v1/admin/accounts/{user_id}/reset-password`), so the text for non-owners says "ask your salon owner to contact StyleBook support". Support contact comes from config.
+- Forgot password: no endpoint. The sign-in screen shows one muted line, "Forgot password? Ask your salon owner or StyleBook support." (ARB `forgotPasswordHint`), the same for every role. The owner cannot reset it in the app (reset is admin-only: `POST /v1/admin/accounts/{user_id}/reset-password`), so there is no sheet and no owner/staff copy variants.
 
 Screens in this feature:
 1. **Sign in** (username, password).
@@ -24,7 +24,7 @@ Screens in this feature:
 ## 3. Layout notes
 - Web/tablet (>= 900 px): centred card on the cream page with amber glow, logo, title, form. Max width from `sb_ui` tokens. Verify code and Change password use the same card (no modal on tablet, a full-screen route; on phone a full-screen route too, not a bottom sheet, because they gate the app).
 - Phone: full-width form, keyboard-aware, primary pill pinned above keyboard.
-- Components: `SbTextField`, `SbErrorBanner`, black pill primary button, `SbTextLink` for "Forgot password?", `SbOtpInput` (6 digits, existing) on Verify code.
+- Components: `SbTextField`, `SbErrorBanner`, black pill primary button, `SbTextLink` for Sign out on the step-up and change-password screens (Forgot password is a plain muted line), `SbOtpInput` (6 digits, existing) on Verify code.
 - **Sign in**: Username (no autocapitalise or autocorrect, `AutofillHints.username`, trimmed, max 50). Password (obscured, `AutofillHints.password`, max 128, eye toggle). Done submits. Button disabled until both non-empty. No password-strength check on sign-in. No sign-up link.
 - **Verify code**: title, "We sent a 6-digit code to +9477***4567" (`phone_masked` from the API, never the number from the client), `SbOtpInput`, "Resend code" link disabled with countdown from `retry_after`, "Sign out" text link (always available as a way out).
 - **Change password**: Current password, New password, Confirm new password (client-only match check), eye toggles (44 px, Semantics), a short hint text of the policy (the policy itself is not in the API: Gap 7), black pill "Change password". When forced there is no back/skip; only Sign out.
@@ -82,7 +82,7 @@ Sign in
 8. Given `ACCOUNT_SUSPENDED`, `ACCOUNT_DISABLED` or `NOT_SALON_MEMBER`, then the specific message in 4.2 shows and no tokens are stored.
 9. Given `salons` is empty (should not happen after `NOT_SALON_MEMBER`), then show "This account has no salon access" and clear the session.
 10. Given the password field, then it is obscured by default; the eye toggles it with Semantics label/state; visibility resets on leaving or backgrounding.
-11. Given "Forgot password?", then guidance sheet shows; no request is made.
+11. Given the sign-in screen, then a muted "Forgot password? Ask your salon owner or StyleBook support." line is shown for every role (no sheet, no owner/staff variants); no request is made.
 12. There is no sign-up entry point.
 
 OTP step-up
@@ -166,7 +166,7 @@ Under `apps/partner/lib/features/auth/` and `packages/`:
   - Map errors by `ErrorResponse.code`; read `Retry-After` into the exception (`api_exception_mapper.dart`).
   - Never log Authorization or bodies of auth calls.
 - ARB: keep `signInTitle`, `signInSubtitle`, `errOffline`, `errServer`, `errSessionExpired`, `retry`, `signOut`, role keys, `otpTitle`, `otpSentTo` (now with `phone_masked`), `otpDigitSemantics`, `resendCode`, `resendIn`, `errOtpWrong`, `errOtpExpired`, `errTooManyRequests`, `errSmsProviderDown`. Remove `phoneLabel`, `phoneHint`, `sendCode`, `changeNumber`, `errPhoneInvalid`, `errNotRegistered` (replaced).
-- New ARB keys: `usernameLabel`, `usernameHint`, `passwordLabel`, `passwordHint`, `showPassword`, `hidePassword`, `signIn`, `forgotPassword`, `forgotPasswordHelpOwner`, `forgotPasswordHelpStaff`, `errCredentials`, `errAccountLocked` (with minutes:seconds), `errRateLimited`, `errServiceUnavailable`, `errAccountSuspended`, `errAccountDisabled`, `errNoSalonAccess`, `errOtpMaxAttempts`, `errOtpNoPending`, `errNoPhoneOnAccount`, `otpResendWait`, `otpNotNow`, `changePasswordTitle`, `changePasswordForcedSubtitle`, `currentPasswordLabel`, `newPasswordLabel`, `confirmPasswordLabel`, `passwordPolicyHint`, `errCurrentPasswordWrong`, `errPasswordMismatch`, `errWeakPassword`, `passwordChanged`, `selectSalonTitle`, `errOtpRequired`.
+- New ARB keys: `usernameLabel`, `usernameHint`, `passwordLabel`, `passwordHint`, `showPassword`, `hidePassword`, `signIn`, `forgotPasswordHint`, `errCredentials`, `errAccountLocked` (with minutes:seconds), `errRateLimited`, `errServiceUnavailable`, `errAccountSuspended`, `errAccountDisabled`, `errNoSalonAccess`, `errOtpMaxAttempts`, `errOtpNoPending`, `errNoPhoneOnAccount`, `otpResendWait`, `otpNotNow`, `changePasswordTitle`, `changePasswordForcedSubtitle`, `currentPasswordLabel`, `newPasswordLabel`, `confirmPasswordLabel`, `passwordPolicyHint`, `errCurrentPasswordWrong`, `errPasswordMismatch`, `errWeakPassword`, `passwordChanged`, `selectSalonTitle`, `errOtpRequired`.
 
 ## 9. Gaps and questions
 Closed since the last revision: old Gap 1 (no login endpoint; now API-56), old Gap 3 (change password now API-58; reset is admin-only), old Gap 4 (credential error codes are listed), old Gap 5 (step-up phone: admin create requires `phone`; send returns 409 if absent), old Gap 8 (`ACCOUNT_DISABLED`, `NOT_SALON_MEMBER`), multi-salon list (`salons[]`).
