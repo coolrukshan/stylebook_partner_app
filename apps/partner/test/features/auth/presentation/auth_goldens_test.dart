@@ -30,4 +30,14 @@ void main() {
     await ScreenHarness(tier: 'full', mustChange: true).pump(tester, const ChangePasswordScreen(), size: phone);
     await expectLater(find.byType(ChangePasswordScreen), matchesGoldenFile('goldens/change_password_390.png'));
   });
+
+  testWidgets('verify_code_1280', (tester) async {
+    await ScreenHarness(tier: 'limited').pump(tester, const VerifyCodeScreen(), size: wide);
+    await expectLater(find.byType(VerifyCodeScreen), matchesGoldenFile('goldens/verify_code_1280.png'));
+  });
+
+  testWidgets('change_password_1280', (tester) async {
+    await ScreenHarness(tier: 'full', mustChange: true).pump(tester, const ChangePasswordScreen(), size: wide);
+    await expectLater(find.byType(ChangePasswordScreen), matchesGoldenFile('goldens/change_password_1280.png'));
+  });
 }
