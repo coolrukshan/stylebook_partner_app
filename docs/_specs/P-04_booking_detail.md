@@ -7,8 +7,8 @@ Show everything about one booking and let staff move it through its status.
 | Role | Can do |
 |---|---|
 | Owner, Manager | View; Accept/Decline (requested), Check in, Start, Complete, Move (P-05), No-show (P-05), Call, Message, respond to dispute |
-| Specialist | View own bookings; Check in, Start, Complete; Call; Message (US-P-11); no Move/No-show/Decline unless manager rights |
-Visible buttons always come from the booking's `allowed_actions`, filtered further by role.
+| Specialist | View own bookings; **Accept / Decline pending own bookings (inline)**, Check in, Start, Complete; Call; Message (US-P-11); no Move/No-show unless manager rights |
+Visible buttons always come from the booking's `allowed_actions`, filtered further by role. Worker-first rule (plan P-01 section 6b): a pending booking shows Accept (black pill) and Decline (white pill) directly at the top of the sheet/panel and on the Today card, no extra screens. Own-booking check needs the worker's `staff_id` (**hard dependency on API Gap 2, P-01**).
 
 ## 2. User stories
 | Story | SRS | Notes |
@@ -46,7 +46,8 @@ Visible buttons always come from the booking's `allowed_actions`, filtered furth
 1. Given a booking id from Calendar or Today, when P-04 opens, then the sheet shows header and summary immediately (from the list item) and fills the rest after the detail call.
 2. Given `status = confirmed` and `allowed_actions` contains check-in, then the primary pill reads "Check in". After success the pill becomes "Start" (checked_in) then "Complete" (in_service), updating status pill from the API response.
 3. Given an action is not in `allowed_actions`, then its button is hidden (not just disabled). A Specialist never sees Move or No-show without manager rights.
-4. Given `status = requested`, then Accept (black) and Decline (white) show; Decline opens the reason chips (same as P-02) and confirm uses `danger`.
+4. Given `status = requested` and `accept`/`decline` are in `allowed_actions`, then Accept (black) and Decline (white) show for Owner, Manager and for a Specialist on their own booking, in place of the primary pill. Accept is one tap, no confirm. Decline expands the reason chips in place (same component as P-02); "Other" needs text; confirm button uses `danger` and is disabled until a reason is chosen; the reason is sent to the API and shown to the client (BR-14).
+4a. Given a Specialist opens a booking that is not theirs, then 403 -> "Not available" and the sheet closes.
 5. Given a double tap, then only one request is sent (button disabled while busy, idempotency key).
 6. Given 409 on an action, then a message shows, the detail is reloaded and buttons reflect the new state.
 7. Given a completed, declined, cancelled, expired or no-show booking, then no status actions show; payment and history remain visible.
@@ -80,3 +81,5 @@ Visible buttons always come from the booking's `allowed_actions`, filtered furth
 7. "Usually every 4 weeks . paid by card": `average_interval_days` exists; payment method does not (`payment_intent_id` only).
 8. Message and Move behaviour belong to P-05; this spec assumes they open as separate sheets.
 9. WebSocket event schema missing (see P-02).
+10. **Own-staff identity (hard dependency, P-01 Gap 2)**: needed to decide "own booking" for Specialist Accept/Decline; `BookingDetailOut` has per-segment `staff_id` to compare against once the user's `staff_id` is known.
+11. Specialist Accept/Decline permission: earlier spec limited it to manager rights; plan 6b grants it for own bookings. Confirm the action endpoint allows it (else 403).

@@ -145,6 +145,7 @@ class SbTokens extends ThemeExtension<SbTokens> {
   static const actionBarHeight = 92.0;
   static const featuredCardHeight = 380.0;
   static const portraitHeaderHeight = 360.0;
+  static const authCardMaxWidth = 440.0;
 
   static const _cat = {
     SbCategory.haircut: (Color(0xFFFBE6D6), Color(0xFFF6CDAE), Color(0xFF9A4413)),

@@ -13,11 +13,13 @@ dependencies:
   flutter:
     sdk: flutter
   sb_core: ^0.0.1
+  uuid: ^4.5.1
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
   flutter_lints: ^6.0.0
+  mocktail: ^1.0.4
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec

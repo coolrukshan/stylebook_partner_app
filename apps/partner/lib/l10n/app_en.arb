@@ -1,0 +1,64 @@
+{
+  "@@locale": "en",
+  "appTitle": "StyleBook Partner",
+  "@appTitle": {
+    "description": "Application title"
+  },
+  "signInTitle": "Sign in to your salon",
+  "signInSubtitle": "Enter your mobile number to receive a one-time verification code.",
+  "phoneLabel": "Mobile number",
+  "phoneHint": "77 123 4567",
+  "sendCode": "Send code",
+  "verifyCode": "Verify code",
+  "otpTitle": "Verification code",
+  "otpSentTo": "Enter the 6-digit code sent to {phone}",
+  "@otpSentTo": {
+    "placeholders": {
+      "phone": {
+        "type": "String"
+      }
+    }
+  },
+  "otpDigitSemantics": "Digit {index} of {total}",
+  "@otpDigitSemantics": {
+    "placeholders": {
+      "index": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+  "resendCode": "Resend code",
+  "resendIn": "Resend code in {time}",
+  "@resendIn": {
+    "placeholders": {
+      "time": {
+        "type": "String"
+      }
+    }
+  },
+  "changeNumber": "Change number",
+  "errPhoneInvalid": "Please enter a valid Sri Lankan mobile number",
+  "errOtpWrong": "The code you entered is incorrect. Please try again.",
+  "errOtpExpired": "This code has expired. Please request a new one.",
+  "errTooManyRequests": "Too many attempts. Please try again in {seconds} seconds.",
+  "@errTooManyRequests": {
+    "placeholders": {
+      "seconds": {
+        "type": "int"
+      }
+    }
+  },
+  "errNotRegistered": "This mobile number is not registered with a salon.",
+  "errSessionExpired": "Your session has expired. Please sign in again.",
+  "errOffline": "You are offline. Please check your internet connection.",
+  "errServer": "A server error occurred. Please try again later.",
+  "errSmsProviderDown": "SMS delivery is currently unavailable. Please try again later.",
+  "retry": "Retry",
+  "signOut": "Sign out",
+  "roleOwner": "Owner",
+  "roleManager": "Manager",
+  "roleSpecialist": "Specialist"
+}

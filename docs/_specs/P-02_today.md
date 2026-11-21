@@ -1,6 +1,6 @@
 # P-02 Today
 
-Feature folder: `features/today/`. PNGs: `mobile/P-02_today.png`, `P-02_today_scrolled.png`, `P-02_today_decline_reason.png`. Stories: US-P-01, 02, 03, 04, 05, 17 (leave card), 35 (disputes card).
+Feature folder: `features/today/`. PNGs: `mobile/P-02_today.png`, `P-02_today_scrolled.png`, `P-02_today_decline_reason.png`. Stories: US-P-01, 02, 03, 04, 05, 17 (leave card), 35 (disputes card). Updated for P-01c (worker-first landing).
 
 ## 1. Goal and roles
 Home screen on every device: run the day from one screen. Requests needing action sit at the top with a count.
@@ -8,7 +8,9 @@ Home screen on every device: run the day from one screen. Requests needing actio
 |---|---|---|
 | Owner | Whole salon | Accept/decline requests, handle reschedules and leave, check in/start/complete |
 | Manager | Whole salon | Same as Owner |
-| Specialist | Own bookings only (send `staff_id` = own id) unless given manager rights | Check in, Start, Complete own bookings; no Accept/Decline unless manager rights; no leave approvals |
+| Specialist | Lands here as **"My bookings"**: only bookings with their own `staff_id`, sorted by time, next one highlighted | Accept / Decline pending own bookings (inline), Check in, Start, Complete own bookings; no leave approvals, no New booking |
+
+Worker-first landing (plan P-01 section 6b): after sign-in every role lands on `/` Today. Owner and Manager see the whole salon with an **All staff / Me** switch (segmented control under the date title; default All staff; Me sends own `staff_id`). Specialist has no switch and the title reads "My bookings". **Hard dependency on API Gap 2 (P-01): `staff_id` of the signed-in worker is not in `UserOut` / `SignInResponse`; without it "My bookings", "Me" and the own-staff filter cannot be built.**
 
 ## 2. User stories
 | Story | SRS | Notes |
@@ -29,7 +31,7 @@ Home screen on every device: run the day from one screen. Requests needing actio
 - Components: `sb_ui` stat card, status pill, action bar, black pill, chips, floating nav.
 
 ## 4. Data and API map
-Main read: GET `/v1/partner/today` query `date` (YYYY-MM-DD, optional), `staff_id` (optional), header `X-Salon-Id`. Response `PartnerTodayOut{date, time_zone, needs_action[], in_chair[], up_next[], stats}`.
+Main read: GET `/v1/partner/today` query `date` (YYYY-MM-DD, optional), `staff_id` (optional; sent = own id for Specialist always, for Owner/Manager only when "Me" is selected), header `X-Salon-Id`. Response `PartnerTodayOut{date, time_zone, needs_action[], in_chair[], up_next[], stats}`.
 
 | UI element | Field | Notes |
 |---|---|---|
@@ -64,7 +66,9 @@ Error codes: 404 booking gone, 409 state conflict (already accepted, expired, sl
 4. Given a request, when Decline is tapped, then the reason panel opens in the card. Confirm decline is disabled until a reason chip is chosen. "Other" requires text.
 5. Given a reason is confirmed, then the request is declined and the client sees the reason (BR-14). The confirm button uses `danger`.
 6. Given an item in `in_chair` with status `checked_in`, then the pill reads Start; with `in_service` it reads Complete. One tap calls the action and moves the row.
-7. Given a Specialist without manager rights, then Accept/Decline and leave tabs are not rendered, and the data is filtered to their own `staff_id`.
+7. Given a Specialist signs in, then Today opens as "My bookings", GET `/v1/partner/today` carries `staff_id` = own id, there is no All staff / Me switch, no leave tab and no New booking pill. Given Owner/Manager, then the switch shows All staff (default) and Me; selecting Me refetches with own `staff_id`, All staff omits it.
+7a. Given a Specialist, then rows in needs-action, in the chair and up next are ordered by start time and the earliest not-yet-finished booking carries a highlight (`SbCard` amber tint/border, label "Next"); highlight moves when it starts or completes.
+7b. Given a pending request is on the card (any role allowed to see it, including Specialist for own bookings), then Accept (black pill) and Decline (white pill) show inline; Accept is one tap, no confirm; Decline expands the reason panel; confirm uses `danger` and is disabled until a reason is chosen ("Other" needs text).
 8. Given the pull-to-refresh gesture, then data reloads.
 9. Given a WebSocket event (new request, status change), then Today updates within 2 s without refresh and a new request appears at the top (see States).
 10. Money shown as `LKR 1,500`; times as `Thu 29 Oct, 9:30 AM` or "Today 4:00 PM"; never computed by the app.
@@ -83,7 +87,8 @@ Error codes: 404 booking gone, 409 state conflict (already accepted, expired, sl
 - The same booking cannot appear in two sections; if status changes, move it.
 - Group/split/home bookings: show `location_type` badge; details on P-04.
 - Time zone: render with `time_zone`, not the device's.
-- Specialist sees only own work; API still enforces.
+- Specialist sees only own work; API still enforces. "Own" = booking has a segment whose `staff_id` equals own id (`services[].staff_id`); multi-staff bookings: see Gap 10.
+- Accept/Decline for Specialist applies only to bookings in their own filtered list; an API 403 shows "Not available" and refetches.
 
 ## 8. Gaps and questions
 1. **Booking action contract**: POST `/v1/partner/bookings/{booking_id}/{action}` has `action` as a free string, no request body, no description. Needs: list of values (accept, decline, check_in, start, complete, no_show, ...) and a body with `reason` for decline (BR-14). Without it the decline reason cannot be sent. Blocks AC 4-5.
@@ -95,3 +100,6 @@ Error codes: 404 booking gone, 409 state conflict (already accepted, expired, sl
 7. Web sections "today's schedule" and "stock summary" have no source on `/v1/partner/today` (schedule can use `/v1/partner/calendar`; stock via `/v1/partner/inventory`). Disputes with 48 h timer (US-P-35) are not on Today.
 8. Today's needs_action cards show `staff_name` only inside `services[]`; confirm that is the assigned specialist.
 9. Header "Salon name . area" and avatar initials: source is not in Today (needs salon profile endpoint).
+10. **Own-staff identity (hard dependency, P-01 Gap 2)**: `UserOut` has no `staff_id` or salon role. "My bookings", the Me switch and the `staff_id` filter are blocked until the API exposes the worker's `staff_id` and role.
+11. `staff_id` on `/v1/partner/today` is described only as "Filter dashboard to specific staff member". Confirm it filters `needs_action` as well as `in_chair`/`up_next`, `stats`, and how multi-staff (split) bookings match.
+12. Can a Specialist call accept/decline on the action endpoint at all (role permission)? Instructions allow it (plan 6b); previous spec limited it to manager rights. Confirm with backend; until then show buttons and handle 403.
