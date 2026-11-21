@@ -70,6 +70,9 @@ final class Full extends SignedIn {
 
 /// Owns the session lifecycle: sign in, step-up, password change, expiry, sign out.
 class SessionController extends AsyncNotifier<AuthState> {
+  /// True from the start of a manual sign-out until local state is cleared.
+  var _signingOut = false;
+
   @override
   Future<AuthState> build() async {
     final storage = ref.watch(tokenStorageProvider);
@@ -86,8 +89,19 @@ class SessionController extends AsyncNotifier<AuthState> {
       return const Unauthenticated();
     }
 
+    final refreshToken = await storage.getRefreshToken();
+    if (refreshToken == null || refreshToken.isEmpty) {
+      await _clearStorage();
+      return const Unauthenticated();
+    }
+
     try {
       // Silent refresh: rotates both tokens. The response has no tier, so keep the stored one.
+      //
+      // This deliberately does not share the interceptor's single-flight. It is safe because
+      // `/v1/auth/refresh` is a public path (the interceptor never handles it) and, while this
+      // future is pending, the router holds every screen on /loading, so no authenticated
+      // request can start and trigger a second refresh with the same refresh token.
       await repo.refresh();
     } on ApiError catch (e) {
       if (e.status == 401 || e.status == 403) {
@@ -133,20 +147,39 @@ class SessionController extends AsyncNotifier<AuthState> {
     if (session is! Full) return;
     final limited = Limited(partnerUser: session.partnerUser, mustChangePassword: session.mustChangePassword);
     state = AsyncData(limited);
-    unawaited(ref.read(tokenStorageProvider).saveCachedUser(jsonEncode(limited.toJson())));
+    unawaited(_persistTier(limited));
+  }
+
+  /// Best effort: the in-memory tier is already corrected, and the server enforces the tier anyway.
+  Future<void> _persistTier(SignedIn session) async {
+    try {
+      await ref.read(tokenStorageProvider).saveCachedUser(jsonEncode(session.toJson()));
+    } catch (_) {
+      // A failed cache write only means the next cold start trusts the server's 403 again.
+    }
   }
 
   /// The session can no longer be refreshed (called by the auth interceptor).
+  /// Ignored unless signed in: a late 401 after sign-out must not show "Session expired".
   Future<void> expire([String? code]) async {
+    if (_signingOut || state.value is! SignedIn) return;
     await _clearStorage();
     _ended(Unauthenticated(reason: _reasonFor(code)));
   }
 
-  /// Best-effort server logout, then clears tokens, tier, user and cached data.
+  /// Clears tokens, tier, user and cached data FIRST, then fires a best-effort server logout
+  /// with the saved refresh token. The POST never delays or undoes the local clearing.
   Future<void> signOut() async {
-    final loggedOut = ref.read(authRepositoryProvider).logout();
-    _ended(const Unauthenticated());
-    await loggedOut;
+    if (_signingOut) return;
+    _signingOut = true;
+    final repo = ref.read(authRepositoryProvider);
+    try {
+      final refreshToken = await repo.clearLocalSession();
+      _ended(const Unauthenticated());
+      unawaited(repo.revokeRefreshToken(refreshToken));
+    } finally {
+      _signingOut = false;
+    }
   }
 
   void _ended(Unauthenticated next) {

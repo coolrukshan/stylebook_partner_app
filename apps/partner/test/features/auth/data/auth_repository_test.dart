@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:convert';
 
 import 'package:dio/dio.dart';
@@ -170,24 +171,60 @@ void main() {
       expect(await tokens.getRefreshToken(), 'n-ref');
     });
 
-    test('logout posts the refresh token and clears tokens and cached user', () async {
+    test('clearLocalSession returns the refresh token and empties storage without any network call', () async {
       await tokens.saveTokens(accessToken: 'a', refreshToken: 'r');
       await tokens.saveCachedUser('{}');
       reply('', 204);
-      await repo.logout();
 
-      expect(seen!.path, '/v1/auth/logout');
-      expect(seen!.data, {'refresh_token': 'r'});
+      final saved = await repo.clearLocalSession();
+
+      expect(saved, 'r');
+      expect(seen, isNull);
       expect(await tokens.getAccessToken(), isNull);
+      expect(await tokens.getRefreshToken(), isNull);
       expect(await tokens.getCachedUser(), isNull);
     });
 
-    test('logout still clears locally when the call fails', () async {
-      await tokens.saveTokens(accessToken: 'a', refreshToken: 'r');
+    test('revokeRefreshToken posts the saved token', () async {
+      reply('', 204);
+      await repo.revokeRefreshToken('r');
+      expect(seen!.path, '/v1/auth/logout');
+      expect(seen!.data, {'refresh_token': 'r'});
+    });
+
+    test('revokeRefreshToken swallows failures and skips the call without a token', () async {
       reply('{"code":"TOKEN_INVALID","message":"x","field":null}', 401);
-      await repo.logout();
-      expect(await tokens.getAccessToken(), isNull);
-      expect(await tokens.getRefreshToken(), isNull);
+      await repo.revokeRefreshToken('r');
+      seen = null;
+      await repo.revokeRefreshToken(null);
+      await repo.revokeRefreshToken('');
+      expect(seen, isNull);
+    });
+
+    test('a late logout completion never touches storage written after sign-out', () async {
+      await tokens.saveTokens(accessToken: 'a', refreshToken: 'r');
+      final gate = Completer<void>();
+      dio.httpClientAdapter = _Adapter((options) async {
+        await gate.future;
+        return ResponseBody.fromString('', 204);
+      });
+
+      final saved = await repo.clearLocalSession();
+      final pending = repo.revokeRefreshToken(saved);
+      await tokens.saveTokens(accessToken: 'new-a', refreshToken: 'new-r');
+      await tokens.saveCachedUser('{"new":true}');
+      gate.complete();
+      await pending;
+
+      expect(await tokens.getAccessToken(), 'new-a');
+      expect(await tokens.getRefreshToken(), 'new-r');
+      expect(await tokens.getCachedUser(), '{"new":true}');
+    });
+
+    test('refresh without a stored refresh token fails locally and posts nothing', () async {
+      reply('{}', 200);
+      await expectLater(repo.refresh(), throwsA(isA<ApiError>().having((e) => e.status, 'status', 401)));
+      expect(seen, isNull);
     });
   });
 

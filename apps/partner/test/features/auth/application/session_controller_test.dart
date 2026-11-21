@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:convert';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -81,6 +82,19 @@ void main() {
       repo.refreshError = apiError(403, 'ACCOUNT_SUSPENDED');
       final state = await container().read(sessionControllerProvider.future);
       expect((state as Unauthenticated).reason, SignedOutReason.suspended);
+    });
+
+    test('tokens but no refresh token: signed out, nothing posted', () async {
+      await tokens.saveTokens(accessToken: 'acc', refreshToken: '');
+      await tokens.saveCachedUser(
+        jsonEncode({'user': kOwnerUser.toJson(), 'tier': 'full', 'must_change_password': false}),
+      );
+      final state = await container().read(sessionControllerProvider.future);
+
+      expect(state, isA<Unauthenticated>());
+      expect(repo.refreshCalls, 0);
+      expect(await tokens.getAccessToken(), isNull);
+      expect(await tokens.getCachedUser(), isNull);
     });
 
     test('offline at launch keeps the cached user and tokens', () async {
@@ -242,6 +256,66 @@ void main() {
       expect(c.read(sessionEpochProvider), epoch + 1);
       expect(await tokens.getAccessToken(), isNull);
       expect(await tokens.getCachedUser(), isNull);
+    });
+
+    test('offline sign-out: the failed logout call still leaves storage empty', () async {
+      await seed(tier: 'full');
+      repo.revokeError = ApiError.offline();
+      final c = container();
+      await c.read(sessionControllerProvider.future);
+
+      await c.read(sessionControllerProvider.notifier).signOut();
+      await Future<void>.delayed(Duration.zero);
+
+      expect(current(c), isA<Unauthenticated>());
+      expect(repo.revokedTokens, ['refreshed-ref']);
+      expect(await tokens.getAccessToken(), isNull);
+      expect(await tokens.getRefreshToken(), isNull);
+      expect(await tokens.getCachedUser(), isNull);
+    });
+
+    test('signOut does not wait for a slow logout call', () async {
+      await seed(tier: 'full');
+      repo.revokeGate = Completer<void>().future;
+      final c = container();
+      await c.read(sessionControllerProvider.future);
+
+      await c.read(sessionControllerProvider.notifier).signOut().timeout(const Duration(seconds: 1));
+
+      expect(current(c), isA<Unauthenticated>());
+      expect(await tokens.getAccessToken(), isNull);
+    });
+
+    test('sign-out then immediate sign-in is not wiped by the late logout completion', () async {
+      await seed(tier: 'full');
+      final gate = Completer<void>();
+      repo.revokeGate = gate.future;
+      final c = container();
+      await c.read(sessionControllerProvider.future);
+      final session = c.read(sessionControllerProvider.notifier);
+
+      await session.signOut();
+      await session.signIn('nimal', 'pw');
+      gate.complete();
+      await Future<void>.delayed(Duration.zero);
+
+      expect(current(c), isA<Limited>());
+      expect(await tokens.getAccessToken(), 'limited-acc');
+      expect(await tokens.getCachedUser(), isNotNull);
+    });
+
+    test('a late 401 after manual sign-out is ignored: no expired banner, no extra epoch bump', () async {
+      await seed(tier: 'full');
+      final c = container();
+      await c.read(sessionControllerProvider.future);
+      final session = c.read(sessionControllerProvider.notifier);
+      await session.signOut();
+      final epoch = c.read(sessionEpochProvider);
+
+      await session.expire('TOKEN_REVOKED');
+
+      expect((current(c) as Unauthenticated).reason, isNull);
+      expect(c.read(sessionEpochProvider), epoch);
     });
 
     test('expire with a TOKEN code signs out as expired and clears the cache', () async {

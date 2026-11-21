@@ -63,6 +63,9 @@ class AuthRepository {
   Future<TokenResponse> refresh() {
     return wrapApiCall(() async {
       final refreshToken = await tokenStorage.getRefreshToken();
+      if (refreshToken == null || refreshToken.isEmpty) {
+        throw const ApiError(message: 'No refresh token', code: 'TOKEN_INVALID', status: 401);
+      }
       final res = await dio.post<Map<String, dynamic>>('/v1/auth/refresh', data: {'refresh_token': refreshToken});
       final response = TokenResponse.fromJson(res.data!);
       await tokenStorage.saveTokens(accessToken: response.accessToken, refreshToken: response.refreshToken);
@@ -70,17 +73,23 @@ class AuthRepository {
     });
   }
 
-  /// Best-effort `POST /v1/auth/logout`, then clears tokens and the cached user locally.
-  Future<void> logout() async {
+  /// Step 1 of sign-out: reads the refresh token, then clears tokens and the cached user.
+  /// Purely local, so it can never be delayed or undone by the network.
+  Future<String?> clearLocalSession() async {
     final refreshToken = await tokenStorage.getRefreshToken();
-    if (refreshToken != null && refreshToken.isNotEmpty) {
-      try {
-        await dio.post<dynamic>('/v1/auth/logout', data: {'refresh_token': refreshToken});
-      } catch (_) {
-        // Best effort: always clear locally.
-      }
-    }
     await tokenStorage.clearTokens();
     await tokenStorage.clearCachedUser();
+    return refreshToken;
+  }
+
+  /// Step 2 of sign-out: best-effort `POST /v1/auth/logout` with the token saved in step 1.
+  /// Never throws and never touches local storage (a new sign-in may already exist).
+  Future<void> revokeRefreshToken(String? refreshToken) async {
+    if (refreshToken == null || refreshToken.isEmpty) return;
+    try {
+      await dio.post<dynamic>('/v1/auth/logout', data: {'refresh_token': refreshToken});
+    } catch (_) {
+      // Best effort: the session is already gone locally.
+    }
   }
 }

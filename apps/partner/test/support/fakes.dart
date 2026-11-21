@@ -56,7 +56,10 @@ class FakeAuthRepository implements AuthRepository {
   final verifyCalls = <String>[];
   final changeCalls = <({String current, String next})>[];
   var refreshCalls = 0;
-  var logoutCalls = 0;
+  final revokedTokens = <String?>[];
+  Future<void>? revokeGate;
+  Object? revokeError;
+  int get logoutCalls => revokedTokens.length;
 
   @override
   Future<PartnerLoginResponse> login(String username, String password) async {
@@ -109,10 +112,18 @@ class FakeAuthRepository implements AuthRepository {
   }
 
   @override
-  Future<void> logout() async {
-    logoutCalls++;
+  Future<String?> clearLocalSession() async {
+    final saved = await tokenStorage.getRefreshToken();
     await tokenStorage.clearTokens();
     await tokenStorage.clearCachedUser();
+    return saved;
+  }
+
+  @override
+  Future<void> revokeRefreshToken(String? refreshToken) async {
+    revokedTokens.add(refreshToken);
+    if (revokeGate != null) await revokeGate;
+    // The real repository never throws from here (best effort); revokeError marks "network failed".
   }
 }
 
